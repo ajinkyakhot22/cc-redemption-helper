@@ -10,6 +10,15 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "keywords": ["credit-card", "rewards", "points", "travel", "india"],
-  "license": "MIT"
+  "keywords": [
+    "credit-card",
+    "rewards",
+    "points",
+    "travel",
+    "india"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
 }
