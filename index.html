@@ -472,6 +472,9 @@ const CARDS = [
   { id:'amex_gold',         bank:'American Express',  full_name:'American Express Gold Card',             tier:'Premium',       points_currency:{name:'Membership Rewards',abbreviation:'MR'}, baseline:{vpp:0.25, method:'Amex portal', note:'Same MR pool as Platinum. 1 MR ≈ ₹0.25'} },
   { id:'hsbc_premier',      bank:'HSBC Bank',         full_name:'HSBC Premier Credit Card',              tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'Apple Store / merchandise redemption', note:'1 RP ≈ ₹1 via Apple Store redemption'} },
   { id:'axis_magnus',       bank:'Axis Bank',         full_name:'Axis Bank Magnus Credit Card',          tier:'Super Premium', points_currency:{name:'Edge Miles',abbreviation:'EM'},          baseline:{vpp:0.20, method:'Axis Edge portal', note:'1 EM ≈ ₹0.20'} },
+  { id:'hdfc_regalia_gold', bank:'HDFC Bank',  full_name:'HDFC Bank Regalia Gold Credit Card', tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},  baseline:{vpp:0.50, method:'HDFC SmartBuy portal', note:'1 RP = ₹0.50 on SmartBuy (vs ₹1 for Infinia/Diners)'} },
+  { id:'axis_atlas',        bank:'Axis Bank',  full_name:'Axis Bank Atlas Credit Card',         tier:'Premium',       points_currency:{name:'EDGE Miles',abbreviation:'EM'},     baseline:{vpp:0.40, method:'Axis Travel Edge portal', note:'1 EM ≈ ₹0.40. Card discontinued — no new applications.'} },
+  { id:'hsbc_travelone',    bank:'HSBC Bank',  full_name:'HSBC TravelOne Credit Card',          tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},  baseline:{vpp:0.50, method:'HSBC Rewards app', note:'1 RP = 1 Air Mile (instant in-app transfer).'} },
 ];
 
 const PARTNERS = [
@@ -618,6 +621,64 @@ const MAPPINGS = [
   {card:'axis_magnus', partner:'qantas_frequent_flyer',  cp:5, pp:2, desc:'5 EDGE = 2 Qantas Points',        min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Best for Australia/NZ routes.', ver:'2026-06-19'},
   {card:'axis_magnus', partner:'vietnam_airlines_lotus', cp:5, pp:2, desc:'5 EDGE = 2 Lotus Miles',          min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Added April 2026.', ver:'2026-06-19'},
   {card:'axis_magnus', partner:'finnair_plus',           cp:5, pp:2, desc:'5 EDGE = 2 Avios (via Finnair)',   min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Added April 2026. Finnair Plus now issues Avios.', ver:'2026-06-19'},
+  // ── HDFC Regalia Gold ──────────────────────────────────────────────────────
+  // Transfer ratio: 2 RP = 1 partner mile/point (confirmed 1 RP = 0.50 miles)
+  {card:'hdfc_regalia_gold', partner:'sq_krisflyer',           cp:2, pp:1, desc:'2 RP = 1 KrisFlyer Mile',        min:2000, mult:2000, time:'7 biz days',  note:'Worse than Infinia 1:1 — consider upgrading for frequent KrisFlyer transfers.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'air_france_flying_blue', cp:2, pp:1, desc:'2 RP = 1 Flying Blue Mile',       min:2000, mult:2000, time:'24 hrs',      note:'Check monthly Promo Awards for 30% off SE Asia routes.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'ba_avios',               cp:2, pp:1, desc:'2 RP = 1 Avios',                  min:2000, mult:2000, time:'24 hrs',      note:'Avios usable on QSuites, Cathay, Finnair, Iberia.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'qatar_privilege_club',   cp:2, pp:1, desc:'2 RP = 1 Avios (Qatar)',          min:2000, mult:2000, time:'24 hrs',      note:'QSuites via Avios. 2:1 ratio still workable for high-value business awards.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'etihad_guest',           cp:2, pp:1, desc:'2 RP = 1 Etihad Guest Mile',      min:2000, mult:2000, time:'24 hrs',      note:'10+ India gateways. "The Business" suite product.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'cathay_asia_miles',      cp:2, pp:1, desc:'2 RP = 1 Asia Mile',              min:2000, mult:2000, time:'24 hrs',      note:'Zone-based chart. CX business consistently world-class.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'turkish_miles_smiles',   cp:2, pp:1, desc:'2 RP = 1 Miles&Smiles Mile',      min:2000, mult:2000, time:'24 hrs',      note:'Even at 2:1, Turkish gives best Star Alliance partner rates.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'air_india_maharaja_club',cp:2, pp:1, desc:'2 RP = 1 Maharaja Club Mile',     min:2000, mult:2000, time:'48–96 hrs',   note:'Star Alliance partner — use for SQ/Lufthansa awards.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'air_canada_aeroplan',    cp:2, pp:1, desc:'2 RP = 1 Aeroplan Point',         min:2000, mult:2000, time:'24 hrs',      note:'No fuel surcharges on SQ awards via Aeroplan.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'united_mileageplus',     cp:2, pp:1, desc:'2 RP = 1 MileagePlus Mile',       min:2000, mult:2000, time:'24 hrs',      note:'Dynamic pricing now applies. Better via Turkish for SQ awards.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'thai_orchid_plus',       cp:2, pp:1, desc:'2 RP = 1 Royal Orchid Plus Mile', min:2000, mult:2000, time:'24 hrs',      ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'finnair_plus',           cp:2, pp:1, desc:'2 RP = 1 Avios (via Finnair)',    min:2000, mult:2000, time:'24 hrs',      note:'Same Avios pool as BA/Qatar. HDFC transfers at 2:1.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'marriott_bonvoy',        cp:2, pp:1, desc:'2 RP = 1 Marriott Bonvoy Point',  min:2000, mult:2000, time:'24 hrs',      note:'JW Marriott, Ritz-Carlton, W Hotels.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'ihg_rewards',            cp:2, pp:1, desc:'2 RP = 1 IHG One Rewards Point',  min:2000, mult:2000, time:'24 hrs',      ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'club_itc',               cp:2, pp:1, desc:'2 RP = 1 ITC Green Point',        min:2000, mult:2000, time:'48–96 hrs',   note:'India only — ITC Maurya, Grand Chola.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'accor_live_limitless',   cp:2, pp:1, desc:'2 RP = 1 Accor ALL Point',        min:2000, mult:2000, time:'24 hrs',      note:'Sofitel, Pullman, Novotel.', ver:'2026-07-06'},
+  {card:'hdfc_regalia_gold', partner:'radisson_rewards',       cp:2, pp:1, desc:'2 RP = 1 Radisson Rewards Point', min:2000, mult:2000, time:'24 hrs',      ver:'2026-07-06'},
+
+  // ── Axis Atlas (DISCONTINUED — no new applications) ────────────────────────
+  // Transfer: 1 EDGE Mile = 2 partner miles for most; exceptions at 1:1
+  {card:'axis_atlas', partner:'sq_krisflyer',           cp:1, pp:2, desc:'1 EM = 2 KrisFlyer Miles',         min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Exceptional 2:1 ratio. Group A (30K EM cap/yr). Card discontinued — existing holders only.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'air_france_flying_blue', cp:1, pp:2, desc:'1 EM = 2 Flying Blue Miles',        min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr). Check Promo Awards for extra savings.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'etihad_guest',           cp:1, pp:2, desc:'1 EM = 2 Etihad Guest Miles',      min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group A (30K EM cap/yr).', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'air_canada_aeroplan',    cp:1, pp:2, desc:'1 EM = 2 Aeroplan Points',         min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group A (30K EM cap/yr). No fuel surcharges on SQ awards.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'japan_airlines_jal',     cp:1, pp:2, desc:'1 EM = 2 JAL Miles',               min:1000, mult:1000, time:'10 biz days',  fee:'₹199+GST', note:'Group A (30K EM cap/yr). Plan 2 weeks ahead.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'turkish_miles_smiles',   cp:1, pp:2, desc:'1 EM = 2 Miles&Smiles Miles',      min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group A (30K EM cap/yr). Best Star Alliance rates.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'united_mileageplus',     cp:1, pp:2, desc:'1 EM = 2 MileagePlus Miles',       min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group A (30K EM cap/yr).', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'thai_orchid_plus',       cp:1, pp:2, desc:'1 EM = 2 Royal Orchid Plus Miles', min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group A (30K EM cap/yr).', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'air_india_maharaja_club',cp:1, pp:2, desc:'1 EM = 2 Maharaja Club Miles',     min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr). Star Alliance partner awards.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'qantas_frequent_flyer',  cp:1, pp:2, desc:'1 EM = 2 Qantas Points',           min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr). Best for Australia/NZ.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'ba_avios',               cp:1, pp:1, desc:'1 EM = 1 Avios',                   min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Exception — 1:1 ratio (not 2:1). Still flexible across QSuites, Cathay, Iberia.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'finnair_plus',           cp:1, pp:1, desc:'1 EM = 1 Avios (via Finnair)',      min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Exception — 1:1 ratio. Same Avios pool as BA/Qatar.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'vietnam_airlines_lotus', cp:1, pp:1, desc:'1 EM = 1 Lotus Mile',              min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Exception — 1:1 ratio. Direct India-Vietnam A350 business class.', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'ihg_rewards',            cp:1, pp:2, desc:'1 EM = 2 IHG One Rewards Points',  min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr).', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'radisson_rewards',       cp:1, pp:2, desc:'1 EM = 2 Radisson Rewards Points', min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr).', ver:'2026-07-06'},
+  {card:'axis_atlas', partner:'wyndham_rewards',        cp:1, pp:2, desc:'1 EM = 2 Wyndham Rewards Points',  min:1000, mult:1000, time:'2–3 biz days', fee:'₹199+GST', note:'Group B (120K EM cap/yr).', ver:'2026-07-06'},
+
+  // ── HSBC TravelOne ─────────────────────────────────────────────────────────
+  // Transfer: 1 RP = 1 Air Mile (1:1 instant via HSBC India app)
+  {card:'hsbc_travelone', partner:'sq_krisflyer',           cp:1, pp:1, desc:'1 RP = 1 KrisFlyer Mile',         min:1000, mult:1000, time:'Instant',      note:'Instant in-app transfer. One of the best KrisFlyer transfer cards in India.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'air_india_maharaja_club',cp:1, pp:1, desc:'1 RP = 1 Maharaja Club Mile',     min:1000, mult:1000, time:'Instant',      note:'Star Alliance partner. Instant transfer via HSBC app.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'ba_avios',               cp:1, pp:1, desc:'1 RP = 1 Avios',                  min:1000, mult:1000, time:'Instant',      note:'Flexible across BA, QSuites, Cathay, Iberia, Finnair.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'air_france_flying_blue', cp:1, pp:1, desc:'1 RP = 1 Flying Blue Mile',       min:1000, mult:1000, time:'Instant',      note:'Monthly Promo Awards for 30% off.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'cathay_asia_miles',      cp:1, pp:1, desc:'1 RP = 1 Asia Mile',              min:1000, mult:1000, time:'Instant',      note:'Zone-based chart. CX business class world-class via HKG.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'etihad_guest',           cp:1, pp:1, desc:'1 RP = 1 Etihad Guest Mile',      min:1000, mult:1000, time:'Instant',      note:'10+ India gateways.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'qatar_privilege_club',   cp:1, pp:1, desc:'1 RP = 1 Avios (Qatar)',          min:1000, mult:1000, time:'Instant',      note:'QSuites — rated world-class business class.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'turkish_miles_smiles',   cp:1, pp:1, desc:'1 RP = 1 Miles&Smiles Mile',      min:1000, mult:1000, time:'Instant',      note:'Best Star Alliance partner rates.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'thai_orchid_plus',       cp:1, pp:1, desc:'1 RP = 1 Royal Orchid Plus Mile', min:1000, mult:1000, time:'Instant',      ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'air_canada_aeroplan',    cp:1, pp:1, desc:'1 RP = 1 Aeroplan Point',         min:1000, mult:1000, time:'Instant',      note:'No fuel surcharges on SQ awards.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'japan_airlines_jal',     cp:1, pp:1, desc:'1 RP = 1 JAL Mile',               min:1000, mult:1000, time:'Instant',      note:'JAL account must be 60+ days old before booking awards.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'qantas_frequent_flyer',  cp:1, pp:1, desc:'1 RP = 1 Qantas Point',           min:1000, mult:1000, time:'Instant',      note:'Best for Australia/NZ. Book Emirates business via Qantas.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'vietnam_airlines_lotus', cp:1, pp:1, desc:'1 RP = 1 Lotus Mile',             min:1000, mult:1000, time:'Instant',      note:'Direct India-Vietnam A350 business class.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'finnair_plus',           cp:1, pp:1, desc:'1 RP = 1 Avios (via Finnair)',     min:1000, mult:1000, time:'Instant',      note:'Finnair Plus now issues Avios.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'ihg_rewards',            cp:1, pp:1, desc:'1 RP = 1 IHG One Rewards Point',  min:1000, mult:1000, time:'Instant',      ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'marriott_bonvoy',        cp:1, pp:1, desc:'1 RP = 1 Marriott Bonvoy Point',  min:1000, mult:1000, time:'Instant',      note:'JW Marriott, Ritz-Carlton, W Hotels.', ver:'2026-07-06'},
+  {card:'hsbc_travelone', partner:'accor_live_limitless',   cp:1, pp:1, desc:'1 RP = 1 Accor ALL Point',        min:1000, mult:1000, time:'Instant',      note:'Sofitel, Pullman, Novotel.', ver:'2026-07-06'},
 ];
 
 const AIRLINE_CHARTS = {
