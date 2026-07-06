@@ -1,0 +1,15 @@
+{
+  "name": "cc-redemption-helper",
+  "version": "0.1.0",
+  "description": "Premium credit card reward points redemption optimizer for India",
+  "main": "engine/recommender.js",
+  "scripts": {
+    "test": "node engine/test.js",
+    "demo": "node engine/test.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": ["credit-card", "rewards", "points", "travel", "india"],
+  "license": "MIT"
+}

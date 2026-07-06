@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PointsWise — Premium Card Redemption Helper</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f1a3e;
+      --navy-mid:   #1a2d6e;
+      --navy-light: #2a4a9f;
+      --gold:       #c9a227;
+      --gold-light: #e8c547;
+      --green:      #16a34a;
+      --green-bg:   #dcfce7;
+      --cyan:       #0891b2;
+      --cyan-bg:    #e0f2fe;
+      --orange:     #ea580c;
+      --orange-bg:  #ffedd5;
+      --red:        #dc2626;
+      --red-bg:     #fee2e2;
+      --gray-50:    #f9fafb;
+      --gray-100:   #f3f4f6;
+      --gray-200:   #e5e7eb;
+      --gray-400:   #9ca3af;
+      --gray-600:   #4b5563;
+      --gray-700:   #374151;
+      --gray-900:   #111827;
+      --white:      #ffffff;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .app-header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .app-logo { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+    .app-logo span { color: var(--gold-light); }
+    .app-tagline { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+    /* ── INPUT SCREEN ── */
+    .input-screen { max-width: 580px; margin: 0 auto; padding: 36px 16px 24px; }
+
+    .hero-text { text-align: center; margin-bottom: 28px; }
+    .hero-text h1 { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1.25; }
+    .hero-text p  { font-size: 14px; color: var(--gray-600); margin-top: 8px; line-height: 1.5; }
+
+    .form-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .form-section-label {
+      font-size: 11px; font-weight: 700; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin: 20px 0 10px;
+    }
+    .form-section-label:first-child { margin-top: 0; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--gray-600); margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid var(--gray-200); border-radius: 10px;
+      font-size: 15px; color: var(--gray-900); background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .form-control:focus { outline: none; border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(42,74,159,0.12); }
+    select.form-control { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Card option tiles */
+    .card-options-grid { display: flex; flex-direction: column; gap: 8px; }
+    .card-option {
+      display: flex; align-items: center; padding: 12px 14px;
+      border: 2px solid var(--gray-200); border-radius: 12px;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .card-option:hover  { border-color: #93a8e0; background: #f5f7ff; }
+    .card-option.active { border-color: var(--navy); background: #eef1f9; }
+
+    .bank-badge {
+      width: 44px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; color: white;
+      flex-shrink: 0; margin-right: 12px; letter-spacing: 0.3px;
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-info-name { font-size: 13px; font-weight: 700; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-info-sub  { font-size: 11px; color: var(--gray-600); margin-top: 1px; }
+    .card-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--gray-300); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .card-option.active .card-radio { border-color: var(--navy); background: var(--navy); }
+    .card-option.active .card-radio::after { content:''; width:6px; height:6px; border-radius:50%; background:white; }
+
+    .btn-primary {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: white; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      margin-top: 24px; letter-spacing: 0.2px;
+      transition: opacity 0.15s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(15,26,62,0.35);
+    }
+    .btn-primary:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); opacity: 1; }
+
+    .error-msg {
+      background: var(--red-bg); color: var(--red);
+      padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; margin-top: 12px; display: none;
+    }
+
+    /* ── RESULTS SCREEN ── */
+    .results-screen { max-width: 740px; margin: 0 auto; padding: 24px 16px 40px; display: none; }
+
+    .back-btn {
+      background: none; border: none; color: var(--navy);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      padding: 6px 0; margin-bottom: 18px;
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: opacity 0.15s;
+    }
+    .back-btn:hover { opacity: 0.7; }
+
+    .query-card {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      border-radius: 16px; padding: 20px 24px; color: white; margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(15,26,62,0.30);
+    }
+    .query-card-title { font-size: 17px; font-weight: 800; margin-bottom: 10px; }
+    .query-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .query-pill {
+      background: rgba(255,255,255,0.12); border-radius: 20px;
+      padding: 4px 12px; font-size: 12px; color: rgba(255,255,255,0.9);
+    }
+    .query-pill strong { color: white; font-weight: 700; }
+
+    .summary-box {
+      background: white; border-left: 4px solid var(--gold);
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+      font-size: 14px; line-height: 1.6; color: var(--gray-900);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-header {
+      font-size: 11px; font-weight: 700; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+    }
+
+    /* ── RECOMMENDATION CARD ── */
+    .rec-card {
+      background: white; border-radius: 16px; overflow: hidden;
+      margin-bottom: 12px; border: 1.5px solid var(--gray-100);
+      box-shadow: var(--shadow-sm); transition: box-shadow 0.15s;
+    }
+    .rec-card:hover { box-shadow: var(--shadow-md); }
+
+    .rec-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 18px; border-bottom: 1px solid var(--gray-100);
+    }
+
+    .rank-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; flex-shrink: 0;
+    }
+    .rank-1 { background: #fbbf24; color: #78350f; }
+    .rank-2 { background: #94a3b8; color: white; }
+    .rank-3 { background: #b87333; color: white; }
+    .rank-n { background: var(--gray-100); color: var(--gray-600); font-size: 12px; }
+
+    .rec-partner-info { flex: 1; min-width: 0; }
+    .rec-partner-name { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+    .type-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 20px; margin-top: 4px;
+    }
+    .pill-airline  { background: #dbeafe; color: #1e40af; }
+    .pill-hotel    { background: #fce7f3; color: #9d174d; }
+    .pill-baseline { background: var(--gray-100); color: var(--gray-600); }
+
+    .rec-value { text-align: right; flex-shrink: 0; }
+    .vpp-number { font-size: 24px; font-weight: 900; line-height: 1; }
+    .vpp-label  { font-size: 10px; color: var(--gray-600); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 1px; }
+    .vpp-excellent { color: var(--green); }
+    .vpp-good      { color: var(--cyan); }
+    .vpp-baseline  { color: var(--orange); }
+    .vpp-below     { color: var(--red); }
+    .vpp-unknown   { color: var(--gray-600); }
+
+    .vs-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px; margin-top: 4px;
+    }
+    .vs-up   { background: var(--green-bg); color: var(--green); }
+    .vs-same { background: var(--orange-bg); color: var(--orange); }
+    .vs-down { background: var(--red-bg); color: var(--red); }
+
+    .rec-body { padding: 16px 18px; }
+
+    .note-box {
+      background: #fffbeb; border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0; padding: 8px 12px;
+      font-size: 12px; color: #92400e; line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 14px; }
+    .detail-item {}
+    .detail-lbl { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-val { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-top: 2px; }
+    .detail-val.accent { color: var(--green); }
+    .detail-val.full { grid-column: 1/-1; font-size: 12px; font-weight: 500; color: var(--gray-600); }
+
+    .leftover-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--gray-50); border-radius: 8px;
+      padding: 9px 14px; margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .leftover-lbl { color: var(--gray-600); }
+    .leftover-val { color: var(--navy); font-weight: 700; }
+
+    .steps-btn {
+      width: 100%; background: none; cursor: pointer;
+      border: 1.5px solid var(--navy-light); color: var(--navy);
+      border-radius: 8px; padding: 8px 14px;
+      font-size: 13px; font-weight: 600;
+      transition: all 0.15s; text-align: left;
+    }
+    .steps-btn:hover { background: var(--navy); color: white; border-color: var(--navy); }
+
+    .steps-list { display: none; margin-top: 10px; padding: 0; list-style: none; }
+    .steps-list.open { display: block; }
+    .steps-list li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0; font-size: 13px; color: var(--gray-600);
+      border-bottom: 1px solid var(--gray-100); line-height: 1.45;
+    }
+    .steps-list li:last-child { border-bottom: none; }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--navy); color: white;
+      font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── REC TYPE TOGGLE ── */
+    .toggle-group { display:flex; gap:8px; }
+    .toggle-btn {
+      flex:1; padding:10px 6px; border:2px solid var(--gray-200);
+      border-radius:10px; background:var(--white); cursor:pointer;
+      font-size:13px; font-weight:600; color:var(--gray-600);
+      transition:all 0.15s; text-align:center; line-height:1.3;
+    }
+    .toggle-btn:hover { border-color:var(--navy-light); color:var(--navy); background:#f5f7ff; }
+    .toggle-btn.active { border-color:var(--navy); background:var(--navy); color:white; }
+
+    /* ── PILL SELECTORS (city, cabin) ── */
+    .pill-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .pill-opt {
+      padding:7px 14px; border:2px solid var(--gray-200);
+      border-radius:20px; background:var(--white); cursor:pointer;
+      font-size:13px; font-weight:600; color:var(--gray-600);
+      transition:all 0.15s; white-space:nowrap;
+    }
+    .pill-opt:hover  { border-color:var(--navy-light); color:var(--navy); background:#f5f7ff; }
+    .pill-opt.active { border-color:var(--navy); background:var(--navy); color:white; }
+
+    /* ── REGION GRID ── */
+    .region-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .region-card {
+      padding:14px 6px; border:2px solid var(--gray-200);
+      border-radius:12px; background:var(--white); cursor:pointer;
+      transition:all 0.15s; text-align:center; user-select:none;
+    }
+    .region-card:hover  { border-color:var(--navy-light); background:#f5f7ff; }
+    .region-card.active { border-color:var(--navy); background:#eef1f9; }
+    .region-emoji { font-size:22px; line-height:1; margin-bottom:5px; }
+    .region-label { font-size:11px; font-weight:700; color:var(--gray-700); line-height:1.3; }
+    .region-card.active .region-label { color:var(--navy); }
+
+    /* ── COUNTRY CHIPS ── */
+    .country-row { display:flex; flex-wrap:wrap; gap:6px; padding-top:4px; }
+    .country-chip {
+      padding:5px 12px; border:1.5px solid var(--gray-200);
+      border-radius:20px; background:var(--white); cursor:pointer;
+      font-size:12px; font-weight:600; color:var(--gray-600);
+      transition:all 0.15s;
+    }
+    .country-chip:hover  { border-color:var(--navy-light); color:var(--navy); background:#f5f7ff; }
+    .country-chip.active { border-color:var(--navy); background:var(--navy); color:white; }
+
+    /* ── VERIFIED BADGE ── */
+    .verified-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:600; padding:2px 8px;
+      border-radius:10px; white-space:nowrap;
+    }
+    .verified-fresh  { background:#dcfce7; color:#166534; }
+    .verified-ok     { background:#fef9c3; color:#854d0e; }
+    .verified-stale  { background:#fee2e2; color:#991b1b; }
+
+    /* ── FOOTER ── */
+    .disclaimer {
+      font-size: 11px; color: var(--gray-400); text-align: center;
+      padding: 20px 16px 32px; line-height: 1.6; max-width: 600px; margin: 0 auto;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 500px) {
+      .form-row       { grid-template-columns: 1fr; }
+      .detail-grid    { grid-template-columns: 1fr; }
+      .query-pills    { gap: 6px; }
+      .app-tagline    { display: none; }
+      .vpp-number     { font-size: 20px; }
+      .form-card      { padding: 24px 18px; }
+    }
+  
+    /* ── FEEDBACK BUTTON ── */
+    .feedback-fab {
+      position: fixed; bottom: 24px; right: 20px; z-index: 999;
+      background: var(--navy); color: white;
+      border: none; border-radius: 24px;
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      display: flex; align-items: center; gap: 7px;
+      transition: background 0.15s, transform 0.15s;
+      text-decoration: none;
+    }
+    .feedback-fab:hover { background: var(--navy-light); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────────────── -->
+<header class="app-header">
+  <div>
+    <div class="app-logo">Points<span>Wise</span></div>
+    <div class="app-tagline">Maximize your premium credit card rewards</div>
+  </div>
+</header>
+
+<!-- ─── INPUT SCREEN ──────────────────────────────────────────────── -->
+<div id="input-screen" class="input-screen">
+  <div class="hero-text">
+    <h1>Find the best use for your reward points</h1>
+    <p>Select your card, enter your balance and destination — we'll rank every redemption option by value per point.</p>
+  </div>
+
+  <div class="form-card">
+
+    <!-- Card selector -->
+    <div class="form-section-label">Your Credit Card</div>
+    <div class="card-options-grid" id="card-selector"></div>
+
+    <!-- Points balance -->
+    <div class="form-section-label">Points Balance</div>
+    <div class="form-group">
+      <label class="form-label" for="pts-input">Reward Points Available</label>
+      <input id="pts-input" class="form-control" type="number" min="1000" step="1000" placeholder="e.g. 150000" value="150000" />
+    </div>
+
+    <!-- What are you planning? -->
+    <div class="form-section-label">What are you planning?</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="tbtn-flight" onclick="pickRecType('flight')">✈ Flights</button>
+      <button class="toggle-btn"        id="tbtn-stay"   onclick="pickRecType('stay')">🏨 Hotel Stays</button>
+      <button class="toggle-btn"        id="tbtn-both"   onclick="pickRecType('both')">✈ + 🏨 Both</button>
+    </div>
+
+    <!-- Flight-only options: source city + cabin class -->
+    <div id="flight-options-section">
+      <div class="form-section-label">Flying From</div>
+      <div class="pill-row" id="city-selector"></div>
+
+      <div class="form-section-label">Cabin Class</div>
+      <div class="pill-row" id="cabin-selector"></div>
+    </div>
+
+    <!-- Destination — two-level: region then country -->
+    <div class="form-section-label">Where to? — Select a Region</div>
+    <div class="region-grid" id="region-selector"></div>
+
+    <div id="country-section" style="display:none">
+      <div class="form-section-label" id="country-label">Which country?</div>
+      <div class="country-row" id="country-selector"></div>
+    </div>
+
+    <!-- Trip details -->
+    <div class="form-section-label">Trip Details</div>
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" for="days-input">Duration (days)</label>
+        <input id="days-input" class="form-control" type="number" min="1" max="30" value="5" />
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" for="travelers-input">Travellers</label>
+        <input id="travelers-input" class="form-control" type="number" min="1" max="6" value="1" />
+      </div>
+    </div>
+
+    <div id="form-error" class="error-msg"></div>
+
+    <button class="btn-primary" onclick="handleSubmit()">Find Best Redemptions →</button>
+  </div>
+
+  <p class="disclaimer">
+    Award rates are indicative. Verify transfer ratios and award availability on your bank's portal and partner program websites before transferring. Point transfers are usually irreversible.
+  </p>
+</div>
+
+<!-- ─── RESULTS SCREEN ────────────────────────────────────────────── -->
+<div id="results-screen" class="results-screen">
+  <button class="back-btn" onclick="showInput()">← Back to search</button>
+  <div id="results-content"></div>
+  <p class="disclaimer">
+    Estimated cash values use average published rates. Hotel awards may use dynamic pricing — check exact costs before transferring. Airline taxes and surcharges are extra. All transfers are at your own risk; always confirm award availability first.
+  </p>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CARDS = [
+  { id:'hdfc_infinia',      bank:'HDFC Bank',         full_name:'HDFC Bank Infinia Credit Card',          tier:'Super Premium', points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'HDFC SmartBuy portal (flights, hotels, vouchers)', note:'1 RP = ₹1 on SmartBuy'} },
+  { id:'hdfc_diners_black', bank:'HDFC Bank',         full_name:'HDFC Bank Diners Club Black',            tier:'Super Premium', points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'HDFC SmartBuy portal', note:'1 RP = ₹1 on SmartBuy'} },
+  { id:'icici_emeralde',    bank:'ICICI Bank',        full_name:'ICICI Bank Emeralde Credit Card',        tier:'Super Premium', points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'ICICI Rewards portal (vouchers/flights)', note:'1 RP ≈ ₹1 on ICICI portal'} },
+  { id:'amex_platinum',     bank:'American Express',  full_name:'American Express Platinum Card',         tier:'Super Premium', points_currency:{name:'Membership Rewards',abbreviation:'MR'}, baseline:{vpp:0.25, method:'Amex Travel portal / statement credit', note:'1 MR ≈ ₹0.25 baseline on Indian Amex portal'} },
+  { id:'amex_gold',         bank:'American Express',  full_name:'American Express Gold Card',             tier:'Premium',       points_currency:{name:'Membership Rewards',abbreviation:'MR'}, baseline:{vpp:0.25, method:'Amex portal', note:'Same MR pool as Platinum. 1 MR ≈ ₹0.25'} },
+  { id:'hsbc_premier',      bank:'HSBC Bank',         full_name:'HSBC Premier Credit Card',              tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'Apple Store / merchandise redemption', note:'1 RP ≈ ₹1 via Apple Store redemption'} },
+  { id:'axis_magnus',       bank:'Axis Bank',         full_name:'Axis Bank Magnus Credit Card',          tier:'Super Premium', points_currency:{name:'Edge Miles',abbreviation:'EM'},          baseline:{vpp:0.20, method:'Axis Edge portal', note:'1 EM ≈ ₹0.20'} },
+];
+
+const PARTNERS = [
+  // Airlines
+  { id:'sq_krisflyer',           name:'Singapore Airlines KrisFlyer', type:'airline', abbr:'SQ', alliance:'Star Alliance', val:{economy:1.2,business:2.5,first:4.0},  note:'Miles expire 3 yrs. Saver awards best value.' },
+  { id:'air_india_maharaja_club',name:'Air India Maharaja Club',       type:'airline', abbr:'AI', alliance:'Star Alliance', val:{economy:0.8,business:1.8,first:3.0},  note:'Rebranded from Flying Returns (2024). Star Alliance member. Direct India flights.' },
+  { id:'etihad_guest',           name:'Etihad Guest',                  type:'airline', abbr:'EY', alliance:'Independent',  val:{economy:0.9,business:2.0,first:3.5},  note:'10+ India gateways. "The Business" is a top-tier product.' },
+  { id:'emirates_skywards',      name:'Emirates Skywards',             type:'airline', abbr:'EK', alliance:'Independent',  val:{economy:1.0,business:2.5,first:5.0},  note:'11+ India gateways. EK Suites on A380 are among the world\'s best.' },
+  { id:'ba_avios',               name:'British Airways Executive Club',type:'airline', abbr:'BA', alliance:'oneworld',     val:{economy:0.7,business:1.5,first:3.0},  note:'Avios usable on QSuites, Cathay, Iberia, Finnair. Distance-based chart.' },
+  { id:'qatar_privilege_club',   name:'Qatar Airways Privilege Club',  type:'airline', abbr:'QR', alliance:'oneworld',     val:{economy:0.9,business:2.2,first:4.0},  note:'Uses Avios. QSuites rated world\'s best business class. Low minimums.' },
+  { id:'cathay_asia_miles',      name:'Cathay Pacific Asia Miles',     type:'airline', abbr:'CX', alliance:'oneworld',     val:{economy:1.0,business:2.5,first:4.5},  note:'Zone-based chart. CX business class consistently world-class.' },
+  { id:'air_france_flying_blue', name:'Air France / KLM Flying Blue',  type:'airline', abbr:'AF', alliance:'SkyTeam',     val:{economy:1.0,business:2.5},             note:'Monthly Promo Awards offer up to 30% off. SkyTeam partners incl Vietnam Airlines.' },
+  { id:'vietnam_airlines_lotus', name:'Vietnam Airlines Lotusmiles',   type:'airline', abbr:'VN', alliance:'SkyTeam',     val:{economy:0.9,business:2.0},             note:'Most direct for India-Vietnam; A350 business class (Lotus Business).' },
+  { id:'thai_orchid_plus',       name:'Royal Orchid Plus (Thai)',       type:'airline', abbr:'TG', alliance:'Star Alliance',val:{economy:0.7,business:1.5},             note:'Good for BKK hub connections. Thai Airways emerging from restructuring.' },
+  { id:'turkish_miles_smiles',   name:'Turkish Airlines Miles&Smiles', type:'airline', abbr:'TK', alliance:'Star Alliance',val:{economy:1.2,business:3.0},             note:'Best Star Alliance partner rates — SQ business to SE Asia at 25k miles OW.' },
+  { id:'avianca_lifemiles',      name:'Avianca LifeMiles',             type:'airline', abbr:'AV', alliance:'Star Alliance',val:{economy:1.0,business:2.5},             note:'Frequent 25-50% promos. No fuel surcharges on Star Alliance partner awards.' },
+  { id:'united_mileageplus',     name:'United MileagePlus',            type:'airline', abbr:'UA', alliance:'Star Alliance',val:{economy:0.8,business:2.0},             note:'Dynamic pricing now applies. Good for ANA partner awards to Japan.' },
+  { id:'air_canada_aeroplan',    name:'Air Canada Aeroplan',           type:'airline', abbr:'AC', alliance:'Star Alliance',val:{economy:1.0,business:2.8},             note:'No fuel surcharges on SQ awards. Stopovers for 5k pts. Great SQ business rates.' },
+  { id:'airasia_rewards',        name:'AirAsia Rewards',               type:'airline', abbr:'AK', alliance:'None',         val:{economy:0.6},                          note:'Budget flights via KUL. HSBC gives 1:3 — best rate. Limited premium value.' },
+  { id:'finnair_plus',           name:'Finnair Plus (Avios)',           type:'airline', abbr:'AY', alliance:'oneworld',    val:{economy:0.7,business:1.5},             note:'Now issues Avios — same pool as BA/Qatar. HDFC transfers at 1:1.' },
+  { id:'japan_airlines_jal',     name:'Japan Airlines (JAL Mileage Bank)',type:'airline', abbr:'JL', alliance:'oneworld', val:{economy:1.2,business:2.5,first:5.0},  note:'Account must be 60+ days old before booking. Slow processing (up to 10 days).' },
+  { id:'qantas_frequent_flyer',  name:'Qantas Frequent Flyer',         type:'airline', abbr:'QF', alliance:'oneworld',    val:{economy:1.0,business:2.2,first:4.0},  note:'Best for Australia/NZ. Can book Emirates Business Class via Qantas points.' },
+  // Hotels
+  { id:'marriott_bonvoy',        name:'Marriott Bonvoy',               type:'hotel',  val:{per_night:0.7},  note:'Ritz-Carlton, W Hotels, JW Marriott. 5th night free on award stays.' },
+  { id:'ihg_rewards',            name:'IHG One Rewards',               type:'hotel',  val:{per_night:0.5},  note:'InterContinental, Crowne Plaza. Strong SE Asia presence.' },
+  { id:'accor_live_limitless',   name:'ALL – Accor Live Limitless',    type:'hotel',  val:{per_night:0.6},  note:'Sofitel, Pullman, Novotel. 2000 points ≈ €40 in value.' },
+  { id:'hilton_honors',          name:'Hilton Honors',                 type:'hotel',  val:{per_night:0.4},  note:'Conrad, Waldorf Astoria, DoubleTree. Variable pricing.' },
+  { id:'club_itc',               name:'Club ITC',                      type:'hotel',  val:{per_night:0.8},  note:'India only — ITC Maurya, Grand Chola. High domestic value.' },
+  { id:'radisson_rewards',       name:'Radisson Rewards',              type:'hotel',  val:{per_night:0.4},  note:'Radisson Blu, Park Inn. Radisson Blu Phu Quoc for Vietnam.' },
+  { id:'wyndham_rewards',        name:'Wyndham Rewards',               type:'hotel',  val:{per_night:0.5},  note:'Flat 15k pts/night structure. Simple and predictable.' },
+];
+
+const MAPPINGS = [
+  // ── HDFC INFINIA (21 partners) — verified June 2026 via SmartBuy portal ──
+  // 1:1 partners
+  {card:'hdfc_infinia', partner:'sq_krisflyer',           cp:1, pp:1, desc:'1 RP = 1 KrisFlyer Mile',        min:1000, mult:1000, time:'7 biz days',   note:'Best airline transfer from HDFC — 1:1 ratio. Plan 7 days ahead.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'air_france_flying_blue', cp:1, pp:1, desc:'1 RP = 1 Flying Blue Mile',       min:2000, mult:2000, time:'24 hrs',       note:'Check monthly Flying Blue Promo Awards (up to 30% off).', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'vietnam_airlines_lotus', cp:1, pp:1, desc:'1 RP = 1 Lotus Mile',             min:2000, mult:2000, time:'24 hrs',       note:'Most direct route to Vietnam Airlines A350 business class.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'finnair_plus',           cp:1, pp:1, desc:'1 RP = 1 Avios (via Finnair)',    min:2000, mult:2000, time:'24 hrs',       note:'Best Avios rate from HDFC — 1:1 vs BA/Qatar at 2:1.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'airasia_rewards',        cp:1, pp:1, desc:'1 RP = 1 AirAsia Reward Point',  min:2000, mult:2000, time:'24 hrs',       note:'Budget option via KUL hub. Limited premium cabin value.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'ihg_rewards',            cp:1, pp:1, desc:'1 RP = 1 IHG One Rewards Point', min:2000, mult:2000, time:'24 hrs',       note:'Good for InterContinental Danang (~80k pts/night).', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'radisson_rewards',       cp:1, pp:1, desc:'1 RP = 1 Radisson Rewards Point',min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'wyndham_rewards',        cp:1, pp:1, desc:'1 RP = 1 Wyndham Rewards Point', min:2000, mult:2000, time:'24 hrs',       note:'Flat 15k pts/night. Predictable and simple.', ver:'2026-06-19'},
+  // 2:1 partners
+  {card:'hdfc_infinia', partner:'air_india_maharaja_club',cp:2, pp:1, desc:'2 RP = 1 Maharaja Club Mile',    min:2000, mult:2000, time:'48–96 hrs',    note:'Star Alliance member. Use for SQ/Lufthansa partner awards.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'air_canada_aeroplan',    cp:2, pp:1, desc:'2 RP = 1 Aeroplan Point',        min:2000, mult:2000, time:'24 hrs',       note:'No fuel surcharges on SQ. Stopover-friendly itineraries.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'avianca_lifemiles',      cp:2, pp:1, desc:'2 RP = 1 LifeMile',              min:2000, mult:2000, time:'24 hrs',       note:'Star Alliance. Watch for 25–50% LifeMiles promos.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'ba_avios',               cp:2, pp:1, desc:'2 RP = 1 Avios',                 min:2000, mult:2000, time:'24 hrs',       note:'Prefer Finnair Plus at 1:1. Avios is flexible across BA/Qatar/Cathay.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'cathay_asia_miles',      cp:2, pp:1, desc:'2 RP = 1 Asia Mile',             min:2000, mult:2000, time:'24 hrs',       note:'Cathay Pacific business/first via HKG. Top-tier product.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'etihad_guest',           cp:2, pp:1, desc:'2 RP = 1 Etihad Guest Mile',     min:2000, mult:2000, time:'24 hrs',       note:'Multiple India gateways. "The Business" is excellent.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'qatar_privilege_club',   cp:2, pp:1, desc:'2 RP = 1 Avios (Qatar)',         min:2000, mult:2000, time:'24 hrs',       note:'Qatar uses Avios. QSuites is the world\'s best business class.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'thai_orchid_plus',       cp:2, pp:1, desc:'2 RP = 1 Royal Orchid Plus Mile',min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'turkish_miles_smiles',   cp:2, pp:1, desc:'2 RP = 1 Miles&Smiles Mile',     min:2000, mult:2000, time:'24 hrs',       note:'Best Star Alliance award rates (e.g. SQ biz to SE Asia at 25k OW).', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'united_mileageplus',     cp:2, pp:1, desc:'2 RP = 1 MileagePlus Mile',      min:2000, mult:2000, time:'24 hrs',       note:'Good for ANA partner awards to Japan.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'accor_live_limitless',   cp:2, pp:1, desc:'2 RP = 1 Accor ALL Point',       min:2000, mult:2000, time:'24 hrs',       note:'Sofitel Metropole Hanoi is a marquee redemption.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'club_itc',               cp:2, pp:1, desc:'2 RP = 1 ITC Green Point',       min:2000, mult:2000, time:'48–96 hrs',    note:'India-only — ITC Maurya, Grand Chola etc.', ver:'2026-06-19'},
+  {card:'hdfc_infinia', partner:'marriott_bonvoy',        cp:2, pp:1, desc:'2 RP = 1 Marriott Bonvoy Point', min:2000, mult:2000, time:'24 hrs',       note:'JW Marriott Phu Quoc, Ritz-Carlton, W Hotels.', ver:'2026-06-19'},
+
+  // ── HDFC DINERS BLACK (same 21 partners, same ratios as Infinia) ──
+  {card:'hdfc_diners_black', partner:'sq_krisflyer',           cp:1, pp:1, desc:'1 RP = 1 KrisFlyer Mile',        min:1000, mult:1000, time:'7 biz days', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'air_france_flying_blue', cp:1, pp:1, desc:'1 RP = 1 Flying Blue Mile',       min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'vietnam_airlines_lotus', cp:1, pp:1, desc:'1 RP = 1 Lotus Mile',             min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'finnair_plus',           cp:1, pp:1, desc:'1 RP = 1 Avios (via Finnair)',    min:2000, mult:2000, time:'24 hrs',    note:'Best Avios rate from HDFC Diners at 1:1.', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'airasia_rewards',        cp:1, pp:1, desc:'1 RP = 1 AirAsia Reward Point',  min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'ihg_rewards',            cp:1, pp:1, desc:'1 RP = 1 IHG One Rewards Point', min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'radisson_rewards',       cp:1, pp:1, desc:'1 RP = 1 Radisson Rewards Point',min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'wyndham_rewards',        cp:1, pp:1, desc:'1 RP = 1 Wyndham Rewards Point', min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'air_india_maharaja_club',cp:2, pp:1, desc:'2 RP = 1 Maharaja Club Mile',    min:2000, mult:2000, time:'48–96 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'air_canada_aeroplan',    cp:2, pp:1, desc:'2 RP = 1 Aeroplan Point',        min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'avianca_lifemiles',      cp:2, pp:1, desc:'2 RP = 1 LifeMile',              min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'ba_avios',               cp:2, pp:1, desc:'2 RP = 1 Avios',                 min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'cathay_asia_miles',      cp:2, pp:1, desc:'2 RP = 1 Asia Mile',             min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'etihad_guest',           cp:2, pp:1, desc:'2 RP = 1 Etihad Guest Mile',     min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'qatar_privilege_club',   cp:2, pp:1, desc:'2 RP = 1 Avios (Qatar)',         min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'thai_orchid_plus',       cp:2, pp:1, desc:'2 RP = 1 Royal Orchid Plus Mile',min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'turkish_miles_smiles',   cp:2, pp:1, desc:'2 RP = 1 Miles&Smiles Mile',     min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'united_mileageplus',     cp:2, pp:1, desc:'2 RP = 1 MileagePlus Mile',      min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'accor_live_limitless',   cp:2, pp:1, desc:'2 RP = 1 Accor ALL Point',       min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'club_itc',               cp:2, pp:1, desc:'2 RP = 1 ITC Green Point',       min:2000, mult:2000, time:'48–96 hrs', ver:'2026-06-19'},
+  {card:'hdfc_diners_black', partner:'marriott_bonvoy',        cp:2, pp:1, desc:'2 RP = 1 Marriott Bonvoy Point', min:2000, mult:2000, time:'24 hrs', ver:'2026-06-19'},
+
+  // ── ICICI EMERALDE (1 partner only) — verified June 2026 ──
+  {card:'icici_emeralde', partner:'air_india_maharaja_club', cp:1, pp:1, desc:'1 RP = 1 Maharaja Club Mile', min:1000, mult:1000, time:'24–48 hrs', note:'Only transfer partner. Star Alliance — useful for SQ partner awards.', ver:'2026-06-19'},
+
+  // ── AMEX PLATINUM (8 partners, all 2:1 airline) — verified June 2026 ──
+  {card:'amex_platinum', partner:'sq_krisflyer',         cp:2, pp:1, desc:'2 MR = 1 KrisFlyer Mile',        min:800,  mult:800,  time:'Instant',   note:'Best Amex airline transfer. SQ business still beats baseline by 3–4x.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'cathay_asia_miles',    cp:2, pp:1, desc:'2 MR = 1 Asia Mile',             min:800,  mult:800,  time:'Instant',   note:'CX business via HKG — consistently world-class product.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'ba_avios',             cp:2, pp:1, desc:'2 MR = 1 Avios',                 min:1200, mult:1200, time:'Instant',   note:'Avios flexible across BA, Qatar QSuites, Iberia, Finnair, Cathay.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'emirates_skywards',    cp:2, pp:1, desc:'2 MR = 1 Skywards Mile',         min:800,  mult:800,  time:'Instant',   note:'11+ India gateways. EK Suites on A380 for Middle East/Europe/USA.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'etihad_guest',         cp:2, pp:1, desc:'2 MR = 1 Etihad Guest Mile',     min:1600, mult:400,  time:'Instant',   note:'Etihad "The Business" is a competitive premium product.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'qatar_privilege_club', cp:2, pp:1, desc:'2 MR = 1 Avios (Qatar)',         min:500,  mult:500,  time:'Instant',   note:'Low minimum. QSuites world\'s best business class. DOH-Europe routes.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'hilton_honors',        cp:10, pp:9, desc:'10 MR = 9 Hilton Points',       min:1000, mult:1000, time:'Instant',   note:'~1:0.9 ratio. Only worth it for specific high-value properties.', ver:'2026-06-19'},
+  {card:'amex_platinum', partner:'marriott_bonvoy',      cp:1,  pp:1, desc:'1 MR = 1 Marriott Bonvoy Point',min:100,  mult:100,  time:'Instant',   note:'Best hotel transfer from Amex MR. Ritz-Carlton, W Hotels.', ver:'2026-06-19'},
+
+  // ── AMEX GOLD (same 8 partners as Platinum — shared MR pool) ──
+  {card:'amex_gold', partner:'sq_krisflyer',         cp:2, pp:1, desc:'2 MR = 1 KrisFlyer Mile',        min:800,  mult:800,  time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'cathay_asia_miles',    cp:2, pp:1, desc:'2 MR = 1 Asia Mile',             min:800,  mult:800,  time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'ba_avios',             cp:2, pp:1, desc:'2 MR = 1 Avios',                 min:1200, mult:1200, time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'emirates_skywards',    cp:2, pp:1, desc:'2 MR = 1 Skywards Mile',         min:800,  mult:800,  time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'etihad_guest',         cp:2, pp:1, desc:'2 MR = 1 Etihad Guest Mile',     min:1600, mult:400,  time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'qatar_privilege_club', cp:2, pp:1, desc:'2 MR = 1 Avios (Qatar)',         min:500,  mult:500,  time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'hilton_honors',        cp:10, pp:9, desc:'10 MR = 9 Hilton Points',       min:1000, mult:1000, time:'Instant', ver:'2026-06-19'},
+  {card:'amex_gold', partner:'marriott_bonvoy',      cp:1,  pp:1, desc:'1 MR = 1 Marriott Bonvoy Point',min:100,  mult:100,  time:'Instant', ver:'2026-06-19'},
+
+  // ── HSBC PREMIER (17 partners) — verified April 2026 ──
+  // 1:1 instant
+  {card:'hsbc_premier', partner:'sq_krisflyer',           cp:1, pp:1, desc:'1 RP = 1 KrisFlyer Mile',         min:1000, mult:1000, time:'Instant',        note:'Best-in-class KrisFlyer rate from any Indian card.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'air_france_flying_blue', cp:1, pp:1, desc:'1 RP = 1 Flying Blue Mile',        min:1000, mult:1000, time:'Instant',        note:'Monthly Promo Awards can give 30% off SE Asia routes.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'airasia_rewards',        cp:1, pp:3, desc:'1 RP = 3 AirAsia Reward Points',  min:1000, mult:1000, time:'Instant',        note:'1:3 ratio — exceptional! Great for AirAsia flights via KUL.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'ba_avios',               cp:1, pp:1, desc:'1 RP = 1 Avios',                  min:1000, mult:1000, time:'Instant',        note:'Flexible across BA, Qatar, Iberia, Finnair, Cathay.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'etihad_guest',           cp:1, pp:1, desc:'1 RP = 1 Etihad Guest Mile',      min:1000, mult:1000, time:'Instant',        note:'10+ India gateways.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'qatar_privilege_club',   cp:1, pp:1, desc:'1 RP = 1 Avios (Qatar)',          min:1000, mult:1000, time:'Instant',        note:'QSuites via Avios.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'qantas_frequent_flyer',  cp:1, pp:1, desc:'1 RP = 1 Qantas Point',           min:1000, mult:1000, time:'Instant',        note:'Best for Australia/NZ. Book Emirates business via Qantas.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'thai_orchid_plus',       cp:1, pp:1, desc:'1 RP = 1 Royal Orchid Plus Mile', min:1000, mult:1000, time:'Instant', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'vietnam_airlines_lotus', cp:1, pp:1, desc:'1 RP = 1 Lotus Mile',             min:1000, mult:1000, time:'Instant',        note:'Direct India-Vietnam A350 business class.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'accor_live_limitless',   cp:1, pp:1, desc:'1 RP = 1 Accor ALL Point',        min:1000, mult:1000, time:'Instant',        note:'Better than HDFC\'s 2:1. Sofitel Metropole Hanoi is marquee.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'ihg_rewards',            cp:1, pp:1, desc:'1 RP = 1 IHG One Rewards Point',  min:1000, mult:1000, time:'Instant', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'marriott_bonvoy',        cp:1, pp:1, desc:'1 RP = 1 Marriott Bonvoy Point',  min:1000, mult:1000, time:'Instant',        note:'Better than HDFC\'s 2:1.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'wyndham_rewards',        cp:1, pp:1, desc:'1 RP = 1 Wyndham Rewards Point',  min:1000, mult:1000, time:'Instant', ver:'2026-06-19'},
+  // 1:1 slow
+  {card:'hsbc_premier', partner:'air_india_maharaja_club',cp:1, pp:1, desc:'1 RP = 1 Maharaja Club Mile',     min:1000, mult:1000, time:'5 biz days',     note:'Plan 5 biz days ahead. Star Alliance partner awards.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'japan_airlines_jal',     cp:1, pp:1, desc:'1 RP = 1 JAL Mile',              min:1000, mult:1000, time:'10 biz days',    note:'Slowest transfer — plan 2 weeks ahead. JAL account must be 60+ days old.', ver:'2026-06-19'},
+  // 2:1
+  {card:'hsbc_premier', partner:'turkish_miles_smiles',   cp:2, pp:1, desc:'2 RP = 1 Miles&Smiles Mile',     min:2000, mult:2000, time:'Instant',        note:'2:1 ratio reduces value vs other HSBC transfers.', ver:'2026-06-19'},
+  {card:'hsbc_premier', partner:'united_mileageplus',     cp:2, pp:1, desc:'2 RP = 1 MileagePlus Mile',      min:2000, mult:2000, time:'Instant',        note:'2:1 ratio + dynamic pricing limits value.', ver:'2026-06-19'},
+
+  // ── AXIS MAGNUS (17 partners, all 5:2, ₹199+GST fee) — verified April 2026 ──
+  // Group A (100K pts/yr cap)
+  {card:'axis_magnus', partner:'sq_krisflyer',           cp:5, pp:2, desc:'5 EDGE = 2 KrisFlyer Miles',        min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', note:'Group A (100K cap). 0.4 miles/EDGE pt. Still competitive given Magnus earn rate.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'air_canada_aeroplan',    cp:5, pp:2, desc:'5 EDGE = 2 Aeroplan Points',        min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', note:'Group A. Stopover-friendly. No fuel surcharges on SQ partner awards.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'etihad_guest',           cp:5, pp:2, desc:'5 EDGE = 2 Etihad Guest Miles',     min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'japan_airlines_jal',     cp:5, pp:2, desc:'5 EDGE = 2 JAL Miles',             min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', note:'Group A. JAL account 60+ days old. Best for Japan.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'turkish_miles_smiles',   cp:5, pp:2, desc:'5 EDGE = 2 Miles&Smiles Miles',    min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', note:'Group A. Good Star Alliance rates despite 5:2.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'thai_orchid_plus',       cp:5, pp:2, desc:'5 EDGE = 2 Royal Orchid Plus Miles',min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'united_mileageplus',     cp:5, pp:2, desc:'5 EDGE = 2 MileagePlus Miles',     min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'ba_avios',               cp:5, pp:2, desc:'5 EDGE = 2 Avios',                 min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', note:'Group A. Added April 2026. QSuites and Cathay via Avios.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'wyndham_rewards',        cp:5, pp:2, desc:'5 EDGE = 2 Wyndham Points',        min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'A', ver:'2026-06-19'},
+  // Group B (400K pts/yr cap)
+  {card:'axis_magnus', partner:'air_france_flying_blue', cp:5, pp:2, desc:'5 EDGE = 2 Flying Blue Miles',     min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B (400K cap). Flying Blue Promo Awards can offset 5:2 ratio.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'air_india_maharaja_club',cp:5, pp:2, desc:'5 EDGE = 2 Maharaja Club Miles',   min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'airasia_rewards',        cp:5, pp:2, desc:'5 EDGE = 2 AirAsia Reward Points', min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'club_itc',               cp:5, pp:2, desc:'5 EDGE = 2 ITC Green Points',      min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. India-only ITC properties.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'ihg_rewards',            cp:5, pp:2, desc:'5 EDGE = 2 IHG One Rewards Points',min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'qantas_frequent_flyer',  cp:5, pp:2, desc:'5 EDGE = 2 Qantas Points',        min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Best for Australia/NZ routes.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'vietnam_airlines_lotus', cp:5, pp:2, desc:'5 EDGE = 2 Lotus Miles',          min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Added April 2026.', ver:'2026-06-19'},
+  {card:'axis_magnus', partner:'finnair_plus',           cp:5, pp:2, desc:'5 EDGE = 2 Avios (via Finnair)',   min:5000, mult:5000, time:'2–3 biz days', fee:'₹199+GST', axis_group:'B', note:'Group B. Added April 2026. Finnair Plus now issues Avios.', ver:'2026-06-19'},
+];
+
+const AIRLINE_CHARTS = {
+
+  // ── Singapore Airlines KrisFlyer ─────────────────────────────────────────
+  sq_krisflyer: [
+    {region:'Southeast_Asia', cabin:'economy', ow:17500, rt:35000,  routes:['BOM-SIN-SGN','DEL-SIN-HAN','BLR-SIN-DAD'],   note:'Vietnam routing via SIN hub'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['BOM-SIN-SGN (biz)','DEL-SIN-HAN (biz)'],      note:'Lie-flat seats; excellent SQ product'},
+    {region:'Southeast_Asia', cabin:'first',   ow:60000, rt:120000, routes:['DEL-SIN (Suites)'],                             note:'Singapore Suites on select DEL-SIN flights'},
+    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['BOM-SIN-NRT','DEL-SIN-ICN','BOM-SIN-HKG'],    note:'Via SIN hub; SQ and partner airlines'},
+    {region:'East_Asia',      cabin:'business',ow:60000, rt:120000, routes:['BOM-SIN-NRT (biz)','DEL-SIN-ICN (biz)'],       note:'SQ business to Japan is consistently excellent'},
+    {region:'East_Asia',      cabin:'first',   ow:85000, rt:170000, routes:['DEL-SIN-NRT (Suites)'],                         note:'Singapore Suites on DEL-SIN; connect NRT on SQ biz'},
+    {region:'Middle_East',    cabin:'economy', ow:35000, rt:70000,  routes:['BOM-SIN-DXB (SQ/EK)'],                          note:'Indirect routing via SIN; EY or EK direct options are cheaper'},
+    {region:'Middle_East',    cabin:'business',ow:65000, rt:130000, routes:['BOM-SIN-DXB (biz)'],                             note:'Not the most efficient for Middle East; consider Etihad/Emirates direct'},
+    {region:'Europe',         cabin:'economy', ow:52500, rt:105000, routes:['BOM-SIN-LHR','DEL-SIN-CDG'],                    note:'SQ has daily LHR and CDG flights via SIN'},
+    {region:'Europe',         cabin:'business',ow:96000, rt:192000, routes:['BOM-SIN-LHR (biz)'],                             note:'SQ Business Class (The Suite) on LHR route is world-class'},
+    {region:'North_America',  cabin:'economy', ow:77500, rt:155000, routes:['BOM-SIN-LAX','DEL-SIN-SFO','BOM-SIN-JFK'],     note:'SQ nonstop SIN-LAX/SFO/JFK — long haul from India via SIN'},
+    {region:'North_America',  cabin:'business',ow:130000,rt:260000, routes:['BOM-SIN-LAX (biz)','DEL-SIN-JFK (biz)'],        note:'SQ A350 ULR business class to USA is outstanding. High mile cost.'},
+    {region:'Australia_NZ',   cabin:'economy', ow:42500, rt:85000,  routes:['BOM-SIN-SYD','DEL-SIN-MEL'],                   note:'Via SIN hub; frequent flights'},
+    {region:'Australia_NZ',   cabin:'business',ow:80000, rt:160000, routes:['BOM-SIN-SYD (biz)','DEL-SIN-MEL (biz)'],        note:'SQ Business Class to Australia — great product'},
+  ],
+
+  // ── Air India Maharaja Club ───────────────────────────────────────────────
+  air_india_maharaja_club: [
+    {region:'Southeast_Asia', cabin:'economy', ow:15000, rt:30000,  routes:['DEL-SGN direct','BOM-HAN via AI'],              note:'Direct AI flights to Vietnam available from DEL and BOM'},
+    {region:'Southeast_Asia', cabin:'business',ow:30000, rt:60000,  routes:['DEL-SGN (AI biz)'],                              note:'Air India business class on India-Vietnam routes'},
+    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['DEL-ICN (AI)','BOM-SIN-NRT (SQ partner)'],      note:'AI flies DEL-ICN direct; Japan via Star Alliance partners'},
+    {region:'East_Asia',      cabin:'business',ow:65000, rt:130000, routes:['DEL-ICN (AI biz)','DEL-NRT via partner'],        note:'Korea direct on AI; Japan via Star Alliance availability'},
+    {region:'Middle_East',    cabin:'economy', ow:12000, rt:24000,  routes:['BOM-DXB','DEL-DXB','BOM-AUH','DEL-RUH'],        note:'AI has many India-Gulf routes. Excellent for Middle East.'},
+    {region:'Middle_East',    cabin:'business',ow:25000, rt:50000,  routes:['BOM-DXB (AI biz)','DEL-DXB (AI biz)'],          note:'AI business class on India-UAE routes. Decent product on newer aircraft.'},
+    {region:'Europe',         cabin:'economy', ow:40000, rt:80000,  routes:['DEL-LHR','BOM-LHR','DEL-LHR-FRA'],              note:'AI flies DEL/BOM-LHR nonstop. Good for UK.'},
+    {region:'Europe',         cabin:'business',ow:70000, rt:140000, routes:['DEL-LHR (AI biz)'],                              note:'Flat beds on B787/B777 to Europe. Improving AI product.'},
+    {region:'North_America',  cabin:'economy', ow:50000, rt:100000, routes:['DEL-JFK nonstop (AI)','DEL-EWR','DEL-ORD'],     note:'AI nonstop DEL-JFK/EWR/ORD/SFO. Excellent for North America.'},
+    {region:'North_America',  cabin:'business',ow:90000, rt:180000, routes:['DEL-JFK (AI biz)','DEL-SFO (AI biz)'],          note:'Nonstop DEL-JFK in business class. AI\'s premium trans-Pacific product.'},
+    {region:'Australia_NZ',   cabin:'economy', ow:45000, rt:90000,  routes:['DEL-SIN-SYD (SQ partner)','BOM-SIN-MEL (SQ)'], note:'Via Star Alliance partners (SQ). No direct AI to Australia.'},
+    {region:'Australia_NZ',   cabin:'business',ow:80000, rt:160000, routes:['DEL-SIN-SYD (SQ partner biz)'],                  note:'Star Alliance partner space required. Availability can be limited.'},
+  ],
+
+  // ── Etihad Guest ─────────────────────────────────────────────────────────
+  etihad_guest: [
+    {region:'Southeast_Asia', cabin:'economy', ow:25000, rt:50000,  routes:['BOM-AUH-SIN','DEL-AUH-BKK','BOM-AUH-KUL'],    note:'Via AUH hub. Convenient as EY has many India gateways.'},
+    {region:'Southeast_Asia', cabin:'business',ow:50000, rt:100000, routes:['BOM-AUH-SIN (biz)','DEL-AUH-BKK (biz)'],       note:'Etihad "The Business" via AUH hub to SE Asia'},
+    {region:'East_Asia',      cabin:'economy', ow:40000, rt:80000,  routes:['BOM-AUH-NRT','DEL-AUH-ICN'],                    note:'Etihad partner routes to Japan/Korea via AUH'},
+    {region:'East_Asia',      cabin:'business',ow:75000, rt:150000, routes:['BOM-AUH-NRT (biz)'],                             note:'Via AUH. EY has limited East Asia coverage.'},
+    {region:'Middle_East',    cabin:'economy', ow:8000,  rt:16000,  routes:['BOM-AUH','DEL-AUH','CCU-AUH','MAA-AUH'],       note:'10+ India gateways to Abu Dhabi. Very accessible.'},
+    {region:'Middle_East',    cabin:'business',ow:16000, rt:32000,  routes:['BOM-AUH (The Business)','DEL-AUH (The Business)'],note:'Etihad "The Business" — flagship product with extra-wide seats'},
+    {region:'Middle_East',    cabin:'first',   ow:30000, rt:60000,  routes:['BOM-AUH (The Residence/Suite)'],                 note:'Etihad First Suite — private cabin with butler service on A380'},
+    {region:'Europe',         cabin:'economy', ow:32000, rt:64000,  routes:['BOM-AUH-LHR','DEL-AUH-FRA','BOM-AUH-CDG'],    note:'Good value economy. Popular BOM-AUH-LHR routing.'},
+    {region:'Europe',         cabin:'business',ow:58000, rt:116000, routes:['BOM-AUH-LHR (biz)','BOM-AUH-FRA (biz)'],       note:'Etihad business to Europe via AUH is competitive'},
+    {region:'North_America',  cabin:'economy', ow:57500, rt:115000, routes:['BOM-AUH-JFK','DEL-AUH-IAD','BOM-AUH-ORD'],    note:'EY flies AUH to many US cities. Good India-USA option.'},
+    {region:'North_America',  cabin:'business',ow:102500,rt:205000, routes:['BOM-AUH-JFK (biz)','DEL-AUH-IAD (biz)'],       note:'Etihad business class to USA via AUH'},
+    {region:'Australia_NZ',   cabin:'economy', ow:40000, rt:80000,  routes:['BOM-AUH-SYD','DEL-AUH-MEL'],                   note:'EY flies AUH-SYD/MEL direct. Sweet spot via AUH.'},
+    {region:'Australia_NZ',   cabin:'business',ow:70000, rt:140000, routes:['BOM-AUH-SYD (biz)','BOM-AUH-MEL (biz)'],       note:'Good Australia business class redemption via AUH hub'},
+  ],
+
+  // ── British Airways Executive Club (Avios) ────────────────────────────────
+  ba_avios: [
+    {region:'Southeast_Asia', cabin:'economy', ow:20000, rt:40000,  routes:['BOM-DOH-BKK (QR)','DEL-DOH-SIN (QR)'],         note:'Via Qatar Airways partner. Avios usable on QR partner flights.'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['BOM-DOH-BKK (QSuites)','DEL-DOH-SIN (QR biz)'],note:'QSuites to SE Asia via DOH. Excellent product.'},
+    {region:'East_Asia',      cabin:'economy', ow:34000, rt:68000,  routes:['BOM-HKG-NRT (CX)','DEL-HKG-ICN (CX)'],         note:'Cathay Pacific via HKG. Zone-based Avios chart.'},
+    {region:'East_Asia',      cabin:'business',ow:62500, rt:125000, routes:['BOM-HKG-NRT (CX biz)'],                          note:'Cathay business class to Japan via HKG — excellent product'},
+    {region:'East_Asia',      cabin:'first',   ow:120000,rt:240000, routes:['BOM-HKG (CX First Suite)'],                      note:'Cathay First Class "The Suite" — world-class. Rarity is the challenge.'},
+    {region:'Middle_East',    cabin:'economy', ow:12500, rt:25000,  routes:['BOM-DOH (QR)','DEL-DOH (QR)'],                  note:'No fuel surcharge on Qatar Airways via Avios'},
+    {region:'Middle_East',    cabin:'business',ow:22500, rt:45000,  routes:['BOM-DOH (QSuites)','DEL-DOH (QSuites)'],        note:'QSuites via Avios — one of the best business redemptions globally'},
+    {region:'Europe',         cabin:'economy', ow:30000, rt:60000,  routes:['BOM-DOH-LHR (QR)','DEL-DOH-CDG (QR)'],         note:'Prefer QR via Avios over BA own metal (high surcharges on BA)'},
+    {region:'Europe',         cabin:'business',ow:65000, rt:130000, routes:['BOM-DOH-LHR (QSuites)'],                         note:'QSuites India-Doha-Europe via Avios — outstanding value'},
+    {region:'North_America',  cabin:'economy', ow:50000, rt:100000, routes:['BOM-DOH-JFK (QR)','DEL-DOH-LAX (QR)'],         note:'Via Qatar via Avios. Cheaper than most other programs for US.'},
+    {region:'North_America',  cabin:'business',ow:90000, rt:180000, routes:['BOM-DOH-JFK (QSuites)'],                         note:'QSuites to USA via Avios — DOH-JFK QSuites is a premium route'},
+    {region:'Australia_NZ',   cabin:'economy', ow:55000, rt:110000, routes:['BOM-HKG-SYD (CX)','DEL-DOH-SYD (QR)'],         note:'Via Cathay or Qatar partners on Avios'},
+    {region:'Australia_NZ',   cabin:'business',ow:110000,rt:220000, routes:['BOM-HKG-SYD (CX biz)','DEL-DOH-SYD (QR biz)'], note:'Cathay or QSuites to Australia via Avios'},
+  ],
+
+  // ── Qatar Airways Privilege Club (Avios) ──────────────────────────────────
+  qatar_privilege_club: [
+    {region:'Southeast_Asia', cabin:'economy', ow:30000, rt:60000,  routes:['BOM-DOH-BKK','DEL-DOH-SIN','BOM-DOH-KUL'],    note:'Qatar Airways via DOH hub. Good connectivity.'},
+    {region:'Southeast_Asia', cabin:'business',ow:60000, rt:120000, routes:['BOM-DOH-BKK (QSuites)','DEL-DOH-SIN (QR biz)'],note:'QSuites product available on DOH-BKK/SIN routes'},
+    {region:'East_Asia',      cabin:'economy', ow:40000, rt:80000,  routes:['BOM-DOH-NRT (QR)','DEL-DOH-HKG (QR)'],         note:'QR flies DOH-NRT, DOH-HKG, DOH-ICN, DOH-PEK'},
+    {region:'East_Asia',      cabin:'business',ow:75000, rt:150000, routes:['BOM-DOH-NRT (QSuites)','DEL-DOH-HKG (QR biz)'],note:'QSuites to East Asia via DOH hub'},
+    {region:'Middle_East',    cabin:'economy', ow:10000, rt:20000,  routes:['BOM-DOH','DEL-DOH','BLR-DOH','HYD-DOH'],       note:'Many India gateways. DOH is QR hub — cheap and easy.'},
+    {region:'Middle_East',    cabin:'business',ow:20000, rt:40000,  routes:['BOM-DOH (QSuites)','DEL-DOH (QSuites)'],        note:'QSuites — world\'s best business class. Short hop from India.'},
+    {region:'Europe',         cabin:'economy', ow:35000, rt:70000,  routes:['BOM-DOH-LHR','DEL-DOH-CDG','BOM-DOH-FRA'],    note:'Qatar Airways has wide Europe coverage via DOH'},
+    {region:'Europe',         cabin:'business',ow:65000, rt:130000, routes:['BOM-DOH-LHR (QSuites)','DEL-DOH-CDG (QSuites)'],note:'QSuites to Europe — consistently top-rated business class'},
+    {region:'North_America',  cabin:'economy', ow:55000, rt:110000, routes:['BOM-DOH-JFK','DEL-DOH-LAX','BOM-DOH-IAD'],    note:'QR has excellent US coverage via DOH. Good economy value.'},
+    {region:'North_America',  cabin:'business',ow:95000, rt:190000, routes:['BOM-DOH-JFK (QSuites)','DEL-DOH-LAX (QSuites)'],note:'QSuites to USA — best business class to North America from India'},
+    {region:'Australia_NZ',   cabin:'economy', ow:55000, rt:110000, routes:['BOM-DOH-SYD','DEL-DOH-MEL','BOM-DOH-PER'],    note:'QR flies DOH-SYD/MEL/PER/AKL. Good Australia coverage.'},
+    {region:'Australia_NZ',   cabin:'business',ow:90000, rt:180000, routes:['BOM-DOH-SYD (QSuites)','DEL-DOH-MEL (QSuites)'],note:'QSuites to Australia via DOH — a premium and popular redemption'},
+  ],
+
+  // ── Thai Royal Orchid Plus ────────────────────────────────────────────────
+  thai_orchid_plus: [
+    {region:'Southeast_Asia', cabin:'economy', ow:12000, rt:24000,  routes:['BOM-BKK-SGN','DEL-BKK-HAN','DEL-BKK-KUL'],   note:'Via BKK hub — TG has good SE Asia network'},
+    {region:'Southeast_Asia', cabin:'business',ow:25000, rt:50000,  routes:['DEL-BKK-SGN (biz)','BOM-BKK-HAN (biz)'],      note:'Thai business class via BKK hub'},
+    {region:'East_Asia',      cabin:'economy', ow:30000, rt:60000,  routes:['BOM-BKK-NRT','DEL-BKK-ICN'],                   note:'Via BKK hub to Japan/Korea. TG flies BKK-NRT/ICN.'},
+    {region:'East_Asia',      cabin:'business',ow:50000, rt:100000, routes:['BOM-BKK-NRT (TG biz)'],                         note:'Thai business class to Japan — Royal Silk product'},
+    {region:'Europe',         cabin:'economy', ow:35000, rt:70000,  routes:['DEL-BKK-LHR (TG)','BOM-BKK-FRA (TG)'],        note:'TG flies BKK to LHR, FRA, CDG, ZUR and more'},
+    {region:'Europe',         cabin:'business',ow:55000, rt:110000, routes:['DEL-BKK-LHR (TG biz)','DEL-BKK-FRA (TG biz)'],note:'Thai business class to Europe via BKK'},
+    {region:'Australia_NZ',   cabin:'economy', ow:40000, rt:80000,  routes:['BOM-BKK-SYD (TG)','DEL-BKK-MEL (TG)'],        note:'TG flies BKK-SYD/MEL direct. Good Australia option.'},
+    {region:'Australia_NZ',   cabin:'business',ow:65000, rt:130000, routes:['BOM-BKK-SYD (TG biz)'],                         note:'Thai business class to Australia via BKK hub'},
+  ],
+
+  // ── Air France / KLM Flying Blue ─────────────────────────────────────────
+  air_france_flying_blue: [
+    {region:'Southeast_Asia', cabin:'economy', ow:18000, rt:36000,  routes:['DEL-HAN (Vietnam Airlines)','BOM-SGN (VN)'],   note:'Vietnam Airlines in SkyTeam; Monthly Promo Awards can drop to ~12k OW'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['DEL-HAN (VN biz A350)','BOM-SGN (VN biz)'],    note:'Vietnam Airlines A350 Lotus Business — lie-flat seats'},
+    {region:'East_Asia',      cabin:'economy', ow:45000, rt:90000,  routes:['DEL-CDG-NRT (AF)','BOM-AMS-ICN (KLM)'],        note:'AF/KLM fly via CDG/AMS hub to Japan, Korea, China'},
+    {region:'East_Asia',      cabin:'business',ow:80000, rt:160000, routes:['DEL-CDG-NRT (AF biz)','BOM-AMS-ICN (KLM biz)'],note:'AF/KLM business class to East Asia'},
+    {region:'Middle_East',    cabin:'economy', ow:22000, rt:44000,  routes:['DEL-CDG-DXB (AF)','BOM-AMS-DXB (KLM)'],        note:'Via CDG/AMS hub — not the most direct, but Promo Awards help'},
+    {region:'Middle_East',    cabin:'business',ow:45000, rt:90000,  routes:['DEL-CDG-DXB (AF biz)'],                          note:'AF business class to Middle East via CDG'},
+    {region:'Europe',         cabin:'economy', ow:35000, rt:70000,  routes:['DEL-CDG (Air France)','BOM-AMS (KLM)'],         note:'AF and KLM have direct India-Europe routes. Competitive economy rates.'},
+    {region:'Europe',         cabin:'business',ow:75000, rt:150000, routes:['DEL-CDG (AF biz La Première)','BOM-AMS (KLM biz)'],note:'AF La Première and KLM World Business Class are both excellent'},
+    {region:'North_America',  cabin:'economy', ow:50000, rt:100000, routes:['DEL-CDG-JFK (AF)','BOM-AMS-JFK (KLM)'],        note:'AF/KLM one-stop to USA via CDG/AMS hub'},
+    {region:'North_America',  cabin:'business',ow:95000, rt:190000, routes:['DEL-CDG-JFK (AF biz)','BOM-AMS-JFK (KLM biz)'],note:'AF business class to NYC — a competitive premium route'},
+  ],
+
+  // ── Cathay Pacific Asia Miles ─────────────────────────────────────────────
+  cathay_asia_miles: [
+    {region:'Southeast_Asia', cabin:'economy', ow:17500, rt:35000,  routes:['BOM-HKG-SGN','DEL-HKG-HAN','BLR-HKG-SGN'],   note:'Via HKG hub; zone-based chart. Good frequency from India.'},
+    {region:'Southeast_Asia', cabin:'business',ow:32500, rt:65000,  routes:['BOM-HKG-SGN (CX biz)','DEL-HKG-HAN (CX biz)'],note:'Cathay The Retreat business class on A350 — world-class product'},
+    {region:'Southeast_Asia', cabin:'first',   ow:55000, rt:110000, routes:['BOM-HKG (The Suite)'],                          note:'Cathay First Class "The Suite" — one of the world\'s best'},
+    {region:'East_Asia',      cabin:'economy', ow:22500, rt:45000,  routes:['BOM-HKG-NRT','DEL-HKG-ICN','BOM-HKG-PEK'],   note:'Via HKG — CX has dense East Asia coverage'},
+    {region:'East_Asia',      cabin:'business',ow:45000, rt:90000,  routes:['BOM-HKG-NRT (CX biz)','DEL-HKG-ICN (CX biz)'],note:'Cathay business to Japan/Korea via HKG'},
+    {region:'East_Asia',      cabin:'first',   ow:80000, rt:160000, routes:['BOM-HKG-NRT (CX first)'],                       note:'Cathay First Class via HKG to Japan — rare and exceptional'},
+    {region:'Middle_East',    cabin:'economy', ow:30000, rt:60000,  routes:['BOM-HKG-DXB (CX/EK)'],                          note:'Via HKG hub, indirect routing for Middle East'},
+    {region:'Middle_East',    cabin:'business',ow:55000, rt:110000, routes:['BOM-HKG-DXB (CX biz)'],                         note:'CX business to Middle East via HKG — less efficient than EY/EK'},
+    {region:'Europe',         cabin:'economy', ow:50000, rt:100000, routes:['BOM-HKG-LHR (CX)','DEL-HKG-FRA (CX)'],        note:'Cathay flies HKG-LHR, FRA, MAN, ZUR, AMS and more'},
+    {region:'Europe',         cabin:'business',ow:90000, rt:180000, routes:['BOM-HKG-LHR (CX biz)','DEL-HKG-FRA (CX biz)'],note:'CX Business The Retreat to Europe via HKG — truly premium'},
+    {region:'Europe',         cabin:'first',   ow:150000,rt:300000, routes:['BOM-HKG-LHR (CX first)'],                       note:'Cathay First Class to London via HKG — pinnacle redemption'},
+    {region:'North_America',  cabin:'economy', ow:55000, rt:110000, routes:['BOM-HKG-JFK (CX)','DEL-HKG-LAX (CX)','BOM-HKG-YVR (CX)'],note:'Cathay flies HKG to JFK, LAX, SFO, YVR, BOS'},
+    {region:'North_America',  cabin:'business',ow:100000,rt:200000, routes:['BOM-HKG-JFK (CX biz)','DEL-HKG-LAX (CX biz)'],note:'CX business to North America via HKG — consistently excellent'},
+    {region:'North_America',  cabin:'first',   ow:150000,rt:300000, routes:['BOM-HKG-JFK (CX first)'],                       note:'Cathay First Class to USA via HKG — very high cost but exceptional'},
+    {region:'Australia_NZ',   cabin:'economy', ow:37500, rt:75000,  routes:['BOM-HKG-SYD','DEL-HKG-MEL'],                  note:'CX flies HKG-SYD/MEL. Good HKG connectivity.'},
+    {region:'Australia_NZ',   cabin:'business',ow:75000, rt:150000, routes:['BOM-HKG-SYD (CX biz)','DEL-HKG-MEL (CX biz)'],note:'CX business to Australia via HKG'},
+  ],
+
+  // ── Vietnam Airlines Lotusmiles ───────────────────────────────────────────
+  vietnam_airlines_lotus: [
+    {region:'Southeast_Asia', cabin:'economy', ow:15000, rt:30000,  routes:['DEL-HAN (direct VN)','BOM-SGN (direct VN)'],   note:'Direct Vietnam Airlines flights from DEL and BOM'},
+    {region:'Southeast_Asia', cabin:'business',ow:35000, rt:70000,  routes:['DEL-HAN (VN biz)','BOM-SGN (VN biz)'],         note:'A350 Lotus Business — lie-flat; very good meal service'},
+  ],
+
+  // ── Turkish Airlines Miles&Smiles ─────────────────────────────────────────
+  turkish_miles_smiles: [
+    {region:'Southeast_Asia', cabin:'economy', ow:15000, rt:27500,  routes:['DEL-BKK-HAN (TG)','DEL-SIN-HAN (SQ)','BOM-SIN-SGN (SQ)'], note:'Lowest Star Alliance rates for SE Asia — an outstanding sweet spot'},
+    {region:'Southeast_Asia', cabin:'business',ow:25000, rt:45000,  routes:['DEL-SIN-HAN (SQ biz)','BOM-BKK-SGN (TG biz)'],             note:'SQ business to Vietnam for only 25k miles OW — exceptional value'},
+    {region:'East_Asia',      cabin:'economy', ow:25000, rt:47500,  routes:['DEL-IST-NRT (TK)','BOM-IST-ICN (TK)'],                     note:'Turkish flies IST-NRT/ICN/HKG. Rates lower than many competitors.'},
+    {region:'East_Asia',      cabin:'business',ow:45000, rt:82500,  routes:['DEL-IST-NRT (TK biz)','BOM-IST-ICN (TK biz)'],             note:'Turkish business class to East Asia via IST'},
+    {region:'Middle_East',    cabin:'economy', ow:15000, rt:27500,  routes:['DEL-IST-DXB (TK)','BOM-IST-DOH (TK)'],                     note:'TK has wide Middle East network from IST. Competitive rates.'},
+    {region:'Middle_East',    cabin:'business',ow:25000, rt:45000,  routes:['DEL-IST-DXB (TK biz)'],                                     note:'Turkish business class to Middle East via IST'},
+    {region:'Europe',         cabin:'economy', ow:20000, rt:37500,  routes:['DEL-IST-LHR (TK)','BOM-IST-CDG (TK)','DEL-IST-FRA (TK)'], note:'Very competitive rates to Europe. IST hub has 300+ European destinations.'},
+    {region:'Europe',         cabin:'business',ow:37500, rt:67500,  routes:['DEL-IST-LHR (TK biz)','DEL-IST-FRA (TK biz)'],             note:'Turkish Business Class "The Business" — lie-flat and well-reviewed'},
+    {region:'North_America',  cabin:'economy', ow:30000, rt:57500,  routes:['DEL-IST-JFK (TK)','BOM-IST-LAX (TK)'],                     note:'TK flies IST to many US cities. Competitive via Istanbul hub.'},
+    {region:'North_America',  cabin:'business',ow:55000, rt:100000, routes:['DEL-IST-JFK (TK biz)','BOM-IST-LAX (TK biz)'],             note:'Turkish business class to USA — competitive rates via IST'},
+    {region:'Australia_NZ',   cabin:'economy', ow:45000, rt:85000,  routes:['BOM-IST-SYD (TK via partner)'],                             note:'TK flies IST-SYD (very long haul) or via Star Alliance partners'},
+    {region:'Australia_NZ',   cabin:'business',ow:75000, rt:140000, routes:['BOM-IST-SYD (TK biz)'],                                     note:'Long routing IST-SYD but TK rates are still competitive'},
+  ],
+
+  // ── Avianca LifeMiles ─────────────────────────────────────────────────────
+  avianca_lifemiles: [
+    {region:'Southeast_Asia', cabin:'economy', ow:17500, rt:35000,  routes:['DEL-SIN-HAN (SQ)','BOM-SIN-SGN (SQ)','DEL-BKK-HAN (TG)'], note:'Watch for LifeMiles promo discounts (25-50% off — common)'},
+    {region:'Southeast_Asia', cabin:'business',ow:37500, rt:75000,  routes:['DEL-SIN-HAN (SQ biz)','BOM-SIN-SGN (SQ biz)'],             note:'SQ Star Alliance partner via LifeMiles — no fuel surcharges'},
+    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['DEL-SIN-NRT (SQ)','BOM-SIN-ICN (SQ/UA partner)'],          note:'Via SQ or LH partner awards. Watch for promos.'},
+    {region:'East_Asia',      cabin:'business',ow:65000, rt:130000, routes:['DEL-SIN-NRT (SQ biz)'],                                     note:'SQ business to Japan via LifeMiles. No fuel surcharges.'},
+    {region:'Europe',         cabin:'economy', ow:30000, rt:57500,  routes:['DEL-FRA (LH)','BOM-ZUR (LX)','DEL-MUC (LH)'],             note:'No fuel surcharges on Lufthansa/Swiss — top value for Europe'},
+    {region:'Europe',         cabin:'business',ow:57500, rt:115000, routes:['DEL-FRA (LH biz)','BOM-ZUR (LX biz)'],                     note:'Lufthansa business via LifeMiles — no surcharges. Great Europe sweet spot.'},
+    {region:'North_America',  cabin:'economy', ow:35000, rt:65000,  routes:['DEL-FRA-JFK (LH/UA)','BOM-IST-JFK (TK)'],                 note:'Via Lufthansa or partner routes. Promo discounts help significantly.'},
+    {region:'North_America',  cabin:'business',ow:62500, rt:125000, routes:['DEL-FRA-JFK (LH biz)'],                                    note:'Lufthansa business class India-Europe-USA via LifeMiles — good value'},
+    {region:'Australia_NZ',   cabin:'economy', ow:42500, rt:85000,  routes:['DEL-SIN-SYD (SQ)','BOM-SIN-MEL (SQ)'],                    note:'SQ partner via LifeMiles to Australia. Watch for promos.'},
+    {region:'Australia_NZ',   cabin:'business',ow:80000, rt:160000, routes:['DEL-SIN-SYD (SQ biz)'],                                    note:'SQ business class to Australia via LifeMiles — no fuel surcharges'},
+  ],
+
+  // ── United MileagePlus ────────────────────────────────────────────────────
+  united_mileageplus: [
+    {region:'Southeast_Asia', cabin:'economy', ow:22000, rt:44000,  routes:['DEL-SIN-HAN (SQ)','BOM-SIN-SGN (SQ)'],        note:'Partner saver rates via SQ; depends on SQ releasing award space'},
+    {region:'Southeast_Asia', cabin:'business',ow:42000, rt:84000,  routes:['DEL-SIN-HAN (SQ biz)','BOM-SIN-SGN (SQ biz)'],note:'SQ business via MileagePlus — dynamic pricing now applies'},
+    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['DEL-IAH-NRT (UA)','BOM-SIN-NRT (SQ partner)'],note:'UA flies EWR/IAD/SFO-NRT. SQ partner space also available.'},
+    {region:'East_Asia',      cabin:'business',ow:65000, rt:130000, routes:['DEL-SIN-NRT (SQ biz partner)','DEL-IAD-NRT (UA Polaris)'],note:'UA Polaris to Japan or SQ partner — good East Asia options'},
+    {region:'Europe',         cabin:'economy', ow:40000, rt:80000,  routes:['DEL-EWR-LHR (UA)','DEL-AMS-LHR (via UA partner)'],note:'UA flies many Europe routes from US gateways'},
+    {region:'Europe',         cabin:'business',ow:70000, rt:140000, routes:['DEL-EWR-LHR (UA Polaris via US)'],              note:'UA Polaris business to Europe — solid premium product'},
+    {region:'North_America',  cabin:'economy', ow:30000, rt:60000,  routes:['DEL-EWR (UA direct)','DEL-IAD (UA)','BOM-IAD (UA)'],note:'UA has direct India-USA nonstop flights. Good economy rates.'},
+    {region:'North_America',  cabin:'business',ow:70000, rt:140000, routes:['DEL-EWR (UA Polaris)','DEL-SFO (UA Polaris)'],  note:'UA Polaris direct DEL-USA nonstop. Well-regarded business product.'},
+    {region:'Australia_NZ',   cabin:'economy', ow:40000, rt:80000,  routes:['DEL-SIN-SYD (SQ partner)','DEL-LAX-SYD (UA/partner)'],note:'Via SQ partner space or via LAX connection'},
+    {region:'Australia_NZ',   cabin:'business',ow:80000, rt:160000, routes:['DEL-SIN-SYD (SQ biz partner)'],                  note:'SQ business to Australia via MileagePlus — availability is the challenge'},
+  ],
+
+  // ── Air Canada Aeroplan ───────────────────────────────────────────────────
+  air_canada_aeroplan: [
+    {region:'Southeast_Asia', cabin:'economy', ow:20000, rt:40000,  routes:['DEL-SIN-HAN (SQ)','BOM-SIN-SGN (SQ)','DEL-BKK-HAN (TG)'], note:'No fuel surcharges on SQ or Thai. Great SE Asia rates.'},
+    {region:'Southeast_Asia', cabin:'business',ow:35000, rt:70000,  routes:['DEL-SIN-HAN (SQ biz)','BOM-SIN-SGN (SQ biz)'],             note:'SQ business via Aeroplan — no fuel surcharges. Top sweet spot.'},
+    {region:'East_Asia',      cabin:'economy', ow:30000, rt:60000,  routes:['DEL-YYZ-NRT (AC)','DEL-SIN-NRT (SQ partner)'],             note:'Aeroplan-ANA partnership: great Japan rates via SQ or direct AC'},
+    {region:'East_Asia',      cabin:'business',ow:55000, rt:110000, routes:['DEL-SIN-NRT (SQ/ANA partner)','DEL-YYZ-NRT (AC/ANA)'],     note:'ANA business class (The Room) via Aeroplan — no surcharges. Outstanding.'},
+    {region:'Middle_East',    cabin:'economy', ow:30000, rt:60000,  routes:['DEL-YYZ-DXB (AC/EK partner)','DEL-FRA-DXB (LH)'],         note:'Via partner airlines. Less efficient for Middle East vs direct banks.'},
+    {region:'Middle_East',    cabin:'business',ow:55000, rt:110000, routes:['DEL-FRA-DXB (LH biz partner)'],                             note:'No fuel surcharges on LH partners via Aeroplan'},
+    {region:'Europe',         cabin:'economy', ow:30000, rt:60000,  routes:['DEL-FRA (LH)','BOM-MUC (LH)','DEL-ZUR (LX)'],            note:'No fuel surcharges on Lufthansa/Swiss/Austrian via Aeroplan'},
+    {region:'Europe',         cabin:'business',ow:55000, rt:110000, routes:['DEL-FRA (LH biz)','BOM-MUC (LH biz)'],                    note:'Lufthansa business no surcharges via Aeroplan — one of the best Europe sweet spots'},
+    {region:'North_America',  cabin:'economy', ow:30000, rt:60000,  routes:['DEL-YYZ (AC direct)','DEL-YVR (AC direct)'],              note:'Air Canada has direct DEL-YYZ/YVR flights. Low Aeroplan rates home.'},
+    {region:'North_America',  cabin:'business',ow:55000, rt:110000, routes:['DEL-YYZ (AC Signature biz)','DEL-YVR (AC biz)'],          note:'AC Signature Class on DEL-Toronto/Vancouver — sleeper seats, good food'},
+    {region:'Australia_NZ',   cabin:'economy', ow:35000, rt:70000,  routes:['DEL-SIN-SYD (SQ)','BOM-SIN-MEL (SQ)'],                   note:'No fuel surcharges on SQ via Aeroplan. Good Australia rates.'},
+    {region:'Australia_NZ',   cabin:'business',ow:70000, rt:140000, routes:['DEL-SIN-SYD (SQ biz)','BOM-SIN-MEL (SQ biz)'],           note:'SQ business to Australia via Aeroplan — no fuel surcharges'},
+  ],
+
+  // ── AirAsia Rewards ───────────────────────────────────────────────────────
+  airasia_rewards: [
+    {region:'Southeast_Asia', cabin:'economy', ow:12000, rt:24000,  routes:['BOM-KUL-SGN','BLR-KUL-HAN','HYD-KUL-BKK'],   note:'Budget option via KUL; economy only. HSBC Premier gives 3x points here.'},
+  ],
+
+  // ── Emirates Skywards ─────────────────────────────────────────────────────
+  emirates_skywards: [
+    {region:'Southeast_Asia', cabin:'economy', ow:27500, rt:55000,  routes:['BOM-DXB-BKK','DEL-DXB-SIN','BOM-DXB-KUL'],   note:'Via DXB hub — EK flies to BKK, SIN, KUL, MNL, CGK, SGN from DXB'},
+    {region:'Southeast_Asia', cabin:'business',ow:55000, rt:110000, routes:['BOM-DXB-BKK (EK biz)','DEL-DXB-SIN (EK biz)'],note:'Emirates Business Class lie-flat — "Game Changer" on B777 and A380'},
+    {region:'Southeast_Asia', cabin:'first',   ow:100000,rt:200000, routes:['BOM-DXB-SIN (EK First)'],                       note:'Emirates First Class Private Suites on A380 — elite experience'},
+    {region:'East_Asia',      cabin:'economy', ow:42500, rt:85000,  routes:['BOM-DXB-NRT','DEL-DXB-ICN','BOM-DXB-HKG'],   note:'Via DXB hub to Japan, Korea, Hong Kong, China, Shanghai'},
+    {region:'East_Asia',      cabin:'business',ow:82500, rt:165000, routes:['BOM-DXB-NRT (EK biz)','DEL-DXB-ICN (EK biz)'],note:'Emirates Business Class to East Asia via DXB'},
+    {region:'East_Asia',      cabin:'first',   ow:157500,rt:315000, routes:['BOM-DXB-NRT (EK First)'],                       note:'Emirates First to Japan — very high cost but exceptional experience'},
+    {region:'Middle_East',    cabin:'economy', ow:7500,  rt:15000,  routes:['BOM-DXB','DEL-DXB','BLR-DXB','CCU-DXB'],      note:'11+ India gateways to Dubai. EK is the dominant India-UAE carrier.'},
+    {region:'Middle_East',    cabin:'business',ow:22500, rt:45000,  routes:['BOM-DXB (EK biz)','DEL-DXB (EK biz)'],         note:'Emirates Business — short hop from India. Game Changer seats on A380.'},
+    {region:'Middle_East',    cabin:'first',   ow:45000, rt:90000,  routes:['BOM-DXB (EK First A380)'],                       note:'Emirates First Private Suite on A380 — shower, bar, butler service'},
+    {region:'Europe',         cabin:'economy', ow:42500, rt:85000,  routes:['BOM-DXB-LHR','DEL-DXB-CDG','BOM-DXB-FRA'],   note:'EK flies to 40+ European cities from DXB. Wide choice of routings.'},
+    {region:'Europe',         cabin:'business',ow:77500, rt:155000, routes:['BOM-DXB-LHR (EK biz)','DEL-DXB-CDG (EK biz)'],note:'Emirates Business Class to Europe — popular and well-regarded routing'},
+    {region:'Europe',         cabin:'first',   ow:147500,rt:295000, routes:['BOM-DXB-LHR (EK First)'],                       note:'Emirates First to Europe — A380 shower + bar + Private Suite on LHR/CDG routes'},
+    {region:'North_America',  cabin:'economy', ow:60000, rt:120000, routes:['BOM-DXB-JFK','DEL-DXB-LAX','BOM-DXB-ORD'],   note:'EK flies DXB to many US/Canada cities. Long haul from India via DXB.'},
+    {region:'North_America',  cabin:'business',ow:115000,rt:230000, routes:['BOM-DXB-JFK (EK biz)','DEL-DXB-LAX (EK biz)'],note:'Emirates Business to USA — Game Changer seats on A380/B777'},
+    {region:'North_America',  cabin:'first',   ow:215000,rt:430000, routes:['BOM-DXB-JFK (EK First A380)'],                  note:'Very high cost. The A380 Suites + Shower experience is incomparable.'},
+    {region:'Australia_NZ',   cabin:'economy', ow:52500, rt:105000, routes:['BOM-DXB-SYD','DEL-DXB-MEL','BOM-DXB-PER'],   note:'EK flies to SYD/MEL/BNE/PER/AKL from DXB. Excellent Australia coverage.'},
+    {region:'Australia_NZ',   cabin:'business',ow:97500, rt:195000, routes:['BOM-DXB-SYD (EK biz)','DEL-DXB-MEL (EK biz)'],note:'Emirates business to Australia — DXB-SYD/MEL are popular routes'},
+    {region:'Australia_NZ',   cabin:'first',   ow:175000,rt:350000, routes:['BOM-DXB-SYD (EK First A380)'],                  note:'Emirates First to Australia — A380 Shower Spa + Private Suite'},
+  ],
+
+  // ── Japan Airlines (JAL Mileage Bank) ────────────────────────────────────
+  japan_airlines_jal: [
+    {region:'Southeast_Asia', cabin:'economy', ow:35000, rt:70000,  routes:['DEL-NRT-BKK (JL)','BOM-HKG-NRT-SGN (JL/CX)'],note:'JAL routes to SE Asia involve routing via Japan. Less efficient.'},
+    {region:'Southeast_Asia', cabin:'business',ow:65000, rt:130000, routes:['DEL-NRT-BKK (JL biz)'],                          note:'JAL business class via Japan hub — high cost due to zone routing'},
+    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['DEL-NRT (JL)','BOM-HKG-NRT (JL via partner)'], note:"Japan is JAL's home — best value here. DEL-NRT via various connections."},
+    {region:'East_Asia',      cabin:'business',ow:60000, rt:120000, routes:['DEL-NRT (JL biz Sky Suite)'],                    note:'JAL Sky Suite business class — lie-flat, door, excellent service'},
+    {region:'East_Asia',      cabin:'first',   ow:90000, rt:180000, routes:['DEL-NRT (JL First Suite)'],                      note:'JAL First Class Suite — private cabin, kaiseki meal service'},
+    {region:'Middle_East',    cabin:'economy', ow:45000, rt:90000,  routes:['DEL-NRT-DXB (JL via partner)'],                  note:'Long routing via Japan to Middle East. Not a sweet spot.'},
+    {region:'Middle_East',    cabin:'business',ow:80000, rt:160000, routes:['DEL-NRT-DXB (JL partner biz)'],                  note:'JAL Oneworld partners for Middle East via Japan hub'},
+    {region:'Europe',         cabin:'economy', ow:55000, rt:110000, routes:['DEL-NRT-LHR (JL)','BOM-NRT-FRA (JL partner)'], note:'JAL has code-share with BA and Oneworld partners for Europe'},
+    {region:'Europe',         cabin:'business',ow:90000, rt:180000, routes:['DEL-NRT-LHR (JL biz)'],                          note:'JAL business class to Europe via NRT — excellent service'},
+    {region:'Europe',         cabin:'first',   ow:130000,rt:260000, routes:['DEL-NRT-LHR (JL First)'],                        note:'JAL First Suite to Europe via NRT — extremely premium experience'},
+    {region:'North_America',  cabin:'economy', ow:60000, rt:120000, routes:['DEL-NRT-LAX (JL)','DEL-NRT-JFK (JL partner)'],note:'JAL flies NRT to LAX/SFO/JFK/ORD/DFW — good US coverage from Tokyo'},
+    {region:'North_America',  cabin:'business',ow:95000, rt:190000, routes:['DEL-NRT-LAX (JL biz)','DEL-NRT-JFK (JL biz)'], note:'JAL business to USA via NRT — JAL Sky Suite is excellent'},
+    {region:'North_America',  cabin:'first',   ow:155000,rt:310000, routes:['DEL-NRT-LAX (JL First Suite)'],                  note:'JAL First Class Suite to USA — private cabin, exceptional food'},
+    {region:'Australia_NZ',   cabin:'economy', ow:55000, rt:110000, routes:['DEL-NRT-SYD (JL)','DEL-NRT-MEL (JL partner)'],note:'JAL flies NRT-SYD/MEL. Routing via Japan adds distance.'},
+    {region:'Australia_NZ',   cabin:'business',ow:85000, rt:170000, routes:['DEL-NRT-SYD (JL biz)'],                          note:'JAL business class to Australia via NRT hub'},
+  ],
+
+  // ── Qantas Frequent Flyer ─────────────────────────────────────────────────
+  qantas_frequent_flyer: [
+    {region:'Southeast_Asia', cabin:'economy', ow:18000, rt:36000,  routes:['BOM-DXB-BKK (EK via QF)','DEL-SIN-BKK (SQ partner)'],note:'Partner airline redemptions via QF Classic Awards'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['BOM-DXB-SIN (EK biz via QF)','DEL-SIN (SQ biz partner)'],note:'Emirates Business to SE Asia via QF-EK partnership. Good value.'},
+    {region:'East_Asia',      cabin:'economy', ow:25000, rt:50000,  routes:['BOM-DXB-NRT (EK via QF)','DEL-SIN-NRT (SQ partner)'],note:'Via Emirates or SQ partner awards on Qantas points'},
+    {region:'East_Asia',      cabin:'business',ow:55000, rt:110000, routes:['BOM-DXB-NRT (EK biz via QF)'],                        note:'Emirates business to Japan via QF-EK partnership'},
+    {region:'Middle_East',    cabin:'economy', ow:12000, rt:24000,  routes:['BOM-DXB (EK via QF)','DEL-DXB (EK via QF)'],         note:'Emirates flights booked on Qantas points. Very accessible rates.'},
+    {region:'Middle_East',    cabin:'business',ow:35000, rt:70000,  routes:['BOM-DXB (EK biz via QF)','DEL-DXB (EK biz via QF)'],  note:'Emirates Business Class to Dubai via QF-EK deal — good value'},
+    {region:'Europe',         cabin:'economy', ow:40000, rt:80000,  routes:['BOM-DXB-LHR (EK via QF)','DEL-DXB-FRA (EK via QF)'], note:'EK via QF points to Europe — notable sweet spot via DXB'},
+    {region:'Europe',         cabin:'business',ow:80000, rt:160000, routes:['BOM-DXB-LHR (EK biz via QF)'],                        note:'Famous: 80k QF pts for EK business BOM-DXB-LHR — excellent value'},
+    {region:'North_America',  cabin:'economy', ow:45000, rt:90000,  routes:['DEL-SYD-LAX (QF)','BOM-DXB-LAX (EK via QF)'],       note:'Via Sydney or via EK partner redemption to USA'},
+    {region:'North_America',  cabin:'business',ow:80000, rt:160000, routes:['DEL-SYD-LAX (QF biz)','BOM-DXB-JFK (EK biz via QF)'],note:'Qantas business or Emirates business to USA via QF points'},
+    {region:'Australia_NZ',   cabin:'economy', ow:20000, rt:40000,  routes:['BOM-DXB-SYD (EK via QF)','DEL-SIN-SYD (SQ partner)'],note:'Good Qantas rates for Australia. EK-QF partnership shines here.'},
+    {region:'Australia_NZ',   cabin:'business',ow:45000, rt:90000,  routes:['BOM-DXB-SYD (EK biz via QF)','DEL-SIN-SYD (SQ biz)'], note:'EK or SQ business class to Australia via QF points — well-priced'},
+  ],
+
+  // ── Finnair Plus (Avios) ──────────────────────────────────────────────────
+  finnair_plus: [
+    {region:'Southeast_Asia', cabin:'economy', ow:20000, rt:40000,  routes:['BOM-DOH-BKK (QR via Avios)','DEL-DOH-SIN (QR)'],   note:'Avios usable on QR, CX, BA, Iberia, JAL partners. Via QR from India.'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['BOM-DOH-BKK (QSuites via Avios)'],                   note:'QSuites via Avios to SE Asia — best way to use Finnair-earned Avios'},
+    {region:'East_Asia',      cabin:'economy', ow:34000, rt:68000,  routes:['BOM-HKG-NRT (CX via Avios)','DEL-HKG-ICN (CX)'],   note:'Cathay Pacific via HKG using Avios — zone-based chart'},
+    {region:'East_Asia',      cabin:'business',ow:62500, rt:125000, routes:['BOM-HKG-NRT (CX biz via Avios)'],                    note:'Cathay business to Japan via Avios — excellent product'},
+    {region:'East_Asia',      cabin:'first',   ow:120000,rt:240000, routes:['BOM-HKG (CX First via Avios)'],                      note:'Cathay First Class via Avios. Very high but exceptional value.'},
+    {region:'Middle_East',    cabin:'economy', ow:12500, rt:25000,  routes:['BOM-DOH (QR via Avios)','DEL-DOH (QR)'],            note:'No fuel surcharge on Qatar Airways via Avios'},
+    {region:'Middle_East',    cabin:'business',ow:22500, rt:45000,  routes:['BOM-DOH (QSuites via Avios)'],                       note:"QSuites India-Doha via Avios. World's best business class."},
+    {region:'Europe',         cabin:'economy', ow:30000, rt:60000,  routes:['BOM-HEL-LHR (AY)','DEL-HEL-FRA (AY)'],             note:'Finnair own metal India-HEL-Europe on Avios — competitive rates'},
+    {region:'Europe',         cabin:'business',ow:60000, rt:120000, routes:['BOM-HEL-LHR (AY biz)','BOM-DOH-LHR (QSuites)'],   note:'Finnair Business or QSuites to Europe via Avios. HDFC 1:1 makes this attractive.'},
+    {region:'North_America',  cabin:'economy', ow:45000, rt:90000,  routes:['BOM-DOH-JFK (QR via Avios)'],                       note:'Via Qatar via Avios. Good value for USA.'},
+    {region:'North_America',  cabin:'business',ow:90000, rt:180000, routes:['BOM-DOH-JFK (QSuites via Avios)'],                   note:'QSuites India-Doha-JFK via Avios — premium transcontinental option'},
+    {region:'Australia_NZ',   cabin:'economy', ow:55000, rt:110000, routes:['BOM-HKG-SYD (CX via Avios)'],                       note:'Cathay Pacific to Australia via Avios. Uses HKG hub.'},
+    {region:'Australia_NZ',   cabin:'business',ow:110000,rt:220000, routes:['BOM-HKG-SYD (CX biz via Avios)'],                   note:'Cathay business class to Australia via Avios'},
+  ],
+
+};
+
+const HOTEL_CHARTS = {
+  marriott_bonvoy: {
+    free_night_benefit:'5th night free on award stays',
+    spotlight:[
+      // Southeast Asia
+      {region:'Southeast_Asia', property:'JW Marriott Phu Quoc Emerald Bay',       location:'Phu Quoc, Vietnam',      cash_usd:350, pts_per_night:60000, note:'Luxury island resort with water park'},
+      {region:'Southeast_Asia', property:'Sheraton Grand Danang Resort',             location:'Danang, Vietnam',         cash_usd:200, pts_per_night:35000, note:'Beachfront resort; great for beach stays'},
+      {region:'Southeast_Asia', property:'W Bangkok',                                location:'Bangkok, Thailand',       cash_usd:250, pts_per_night:40000, note:'Iconic W lifestyle hotel; great nightlife hub'},
+      {region:'Southeast_Asia', property:'The St. Regis Bali Resort',               location:'Nusa Dua, Bali',          cash_usd:420, pts_per_night:70000, note:'Butler service, private villas, stunning beach'},
+      // East Asia
+      {region:'East_Asia', property:'The Ritz-Carlton Tokyo',                        location:'Tokyo, Japan',            cash_usd:700, pts_per_night:100000, note:'Top-floor views of Mt. Fuji from Roppongi Hills'},
+      {region:'East_Asia', property:'W Osaka',                                        location:'Osaka, Japan',           cash_usd:350, pts_per_night:60000, note:'Striking design in Nakanoshima district'},
+      {region:'East_Asia', property:'The St. Regis Seoul',                           location:'Seoul, South Korea',     cash_usd:400, pts_per_night:65000, note:'Gangnam luxury; butler service as standard'},
+      {region:'East_Asia', property:'The Ritz-Carlton Hong Kong',                    location:'Hong Kong',               cash_usd:550, pts_per_night:85000, note:'ICC tower; iconic Victoria Harbour views'},
+      // Middle East
+      {region:'Middle_East', property:'The Ritz-Carlton Dubai, DIFC',               location:'Dubai, UAE',              cash_usd:400, pts_per_night:70000, note:'Heart of the financial district; excellent dining'},
+      {region:'Middle_East', property:'W Dubai – The Palm',                          location:'Dubai, UAE',              cash_usd:350, pts_per_night:55000, note:'Beachfront on Palm Jumeirah with iconic W pool'},
+      {region:'Middle_East', property:'The St. Regis Doha',                         location:'Doha, Qatar',             cash_usd:300, pts_per_night:50000, note:'Butler service; ideal for Qatar stopovers'},
+      // Europe
+      {region:'Europe', property:'W Paris – Opéra',                                  location:'Paris, France',          cash_usd:450, pts_per_night:70000, note:'Stunning Haussmann building near Palais Garnier'},
+      {region:'Europe', property:'The Westin Palace Milan',                           location:'Milan, Italy',           cash_usd:350, pts_per_night:55000, note:'Grand palazzo opposite the Brera district'},
+      {region:'Europe', property:'W Amsterdam',                                        location:'Amsterdam, Netherlands',cash_usd:400, pts_per_night:60000, note:'Three restored canal houses; great design hotel'},
+      {region:'Europe', property:'Sheraton Grand London Park Lane',                   location:'London, UK',             cash_usd:350, pts_per_night:50000, note:'Classic Mayfair address; solid points value'},
+      // North America
+      {region:'North_America', property:'The Ritz-Carlton New York, Central Park',   location:'New York, USA',          cash_usd:800, pts_per_night:100000, note:'Iconic Central Park views; top Ritz-Carlton in NYC'},
+      {region:'North_America', property:'W New York – Times Square',                 location:'New York, USA',          cash_usd:350, pts_per_night:50000, note:'Times Square energy with W lifestyle amenities'},
+      {region:'North_America', property:'The St. Regis Chicago',                     location:'Chicago, USA',           cash_usd:400, pts_per_night:60000, note:'Michelin-starred dining; Lake Michigan views'},
+      // Australia & NZ
+      {region:'Australia_NZ', property:'W Sydney',                                   location:'Sydney, Australia',      cash_usd:350, pts_per_night:55000, note:'In The Star complex; rooftop pool with harbour view'},
+      {region:'Australia_NZ', property:'Sheraton Grand Sydney Hyde Park',             location:'Sydney, Australia',      cash_usd:250, pts_per_night:40000, note:'Heritage building next to Hyde Park; great value'},
+      {region:'Australia_NZ', property:'The Westin Melbourne',                        location:'Melbourne, Australia',   cash_usd:280, pts_per_night:45000, note:'Heavenly beds in the heart of Melbourne CBD'},
+    ],
+  },
+  ihg_rewards: {
+    free_night_benefit:'4th night free on award stays',
+    spotlight:[
+      // Southeast Asia
+      {region:'Southeast_Asia', property:'InterContinental Danang Sun Peninsula Resort', location:'Danang, Vietnam',     cash_usd:500, pts_per_night:80000, note:"Clifftop resort — one of Asia's best; 4th night free is exceptional value"},
+      {region:'Southeast_Asia', property:'InterContinental Hanoi Landmark72',           location:'Hanoi, Vietnam',       cash_usd:180, pts_per_night:40000, note:'City centre with great skyline views'},
+      {region:'Southeast_Asia', property:'InterContinental Singapore',                  location:'Singapore',             cash_usd:350, pts_per_night:60000, note:'Heritage building on Nicoll Highway; excellent base'},
+      {region:'Southeast_Asia', property:'InterContinental Bangkok',                    location:'Bangkok, Thailand',     cash_usd:250, pts_per_night:45000, note:'Ploenchit; ideal for shopping and BTS access'},
+      // East Asia
+      {region:'East_Asia', property:'InterContinental Tokyo Bay',                       location:'Tokyo, Japan',          cash_usd:300, pts_per_night:55000, note:'Waterfront views; convenient for Odaiba & Shimbashi'},
+      {region:'East_Asia', property:'Regent Hong Kong',                                 location:'Hong Kong',              cash_usd:600, pts_per_night:90000, note:'Iconic harbour views; IHG ultra-premium brand'},
+      {region:'East_Asia', property:'InterContinental Seoul',                           location:'Seoul, South Korea',    cash_usd:280, pts_per_night:50000, note:'Gangnam; well-located for business and leisure'},
+      // Middle East
+      {region:'Middle_East', property:'InterContinental Dubai Festival City',           location:'Dubai, UAE',            cash_usd:250, pts_per_night:45000, note:'Dubai Creek views; next to Festival City Mall'},
+      {region:'Middle_East', property:'InterContinental Abu Dhabi',                     location:'Abu Dhabi, UAE',        cash_usd:220, pts_per_night:40000, note:'Corniche location; great for AUH stopovers'},
+      {region:'Middle_East', property:'InterContinental Doha The City',                location:'Doha, Qatar',            cash_usd:200, pts_per_night:35000, note:'West Bay district; good value 4th-night-free target'},
+      // Europe
+      {region:'Europe', property:'InterContinental Paris Le Grand',                     location:'Paris, France',         cash_usd:450, pts_per_night:70000, note:'Directly opposite Palais Garnier; landmark hotel'},
+      {region:'Europe', property:'InterContinental London Park Lane',                   location:'London, UK',            cash_usd:500, pts_per_night:75000, note:'Overlooking Hyde Park Corner; Mayfair elegance'},
+      {region:'Europe', property:'InterContinental Barcelona',                          location:'Barcelona, Spain',      cash_usd:300, pts_per_night:50000, note:'Diagonal; great access to Eixample and Sagrada Família'},
+      // North America
+      {region:'North_America', property:'InterContinental New York Barclay',            location:'New York, USA',         cash_usd:350, pts_per_night:55000, note:'Classic Midtown landmark; recently renovated'},
+      {region:'North_America', property:'InterContinental Chicago Magnificent Mile',    location:'Chicago, USA',          cash_usd:300, pts_per_night:50000, note:'On the Mag Mile; Michigan Avenue views'},
+      {region:'North_America', property:'InterContinental Los Angeles Downtown',        location:'Los Angeles, USA',      cash_usd:280, pts_per_night:45000, note:'Wilshire Grand tower; tallest building west of the Mississippi'},
+      // Australia & NZ
+      {region:'Australia_NZ', property:'InterContinental Sydney',                       location:'Sydney, Australia',     cash_usd:350, pts_per_night:60000, note:'Treasury heritage building; Circular Quay location'},
+      {region:'Australia_NZ', property:'InterContinental Melbourne The Rialto',         location:'Melbourne, Australia',  cash_usd:280, pts_per_night:50000, note:'Collins Street; stunning Gothic Revival building'},
+      {region:'Australia_NZ', property:'Crowne Plaza Auckland',                         location:'Auckland, New Zealand', cash_usd:200, pts_per_night:35000, note:'Harbour views in CBD; best value IHG in NZ'},
+    ],
+  },
+  accor_live_limitless: {
+    spotlight:[
+      // Southeast Asia
+      {region:'Southeast_Asia', property:'Sofitel Legend Metropole Hanoi',     location:'Hanoi, Vietnam',              cash_usd:400, pts_per_night:25000, note:"Historic colonial icon; one of Asia's great hotels"},
+      {region:'Southeast_Asia', property:'Pullman Danang Beach Resort',        location:'Danang, Vietnam',             cash_usd:200, pts_per_night:12000, note:'Beachfront; excellent Accor value for Danang'},
+      {region:'Southeast_Asia', property:'Sofitel Bangkok Sukhumvit',          location:'Bangkok, Thailand',           cash_usd:200, pts_per_night:14000, note:'French elegance on Asok; BTS connected'},
+      {region:'Southeast_Asia', property:'Sofitel Singapore Sentosa Resort & Spa', location:'Singapore',               cash_usd:350, pts_per_night:22000, note:'Clifftop resort on Sentosa; best Accor in Singapore'},
+      // East Asia
+      {region:'East_Asia', property:'Sofitel Tokyo Takanawa',                  location:'Tokyo, Japan',                cash_usd:280, pts_per_night:18000, note:'French design in Minato; great base for Tokyo'},
+      {region:'East_Asia', property:'Fairmont Peace Hotel Shanghai',           location:'Shanghai, China',             cash_usd:350, pts_per_night:22000, note:'Art Deco icon on the Bund; legendary Jazz Bar'},
+      {region:'East_Asia', property:'Pullman Tokyo Tamachi',                   location:'Tokyo, Japan',                cash_usd:200, pts_per_night:12000, note:'Modern business hotel; best Accor value in Tokyo'},
+      // Middle East
+      {region:'Middle_East', property:'Fairmont The Palm',                     location:'Dubai, UAE',                  cash_usd:350, pts_per_night:22000, note:'On Palm Jumeirah; private beach club & multiple pools'},
+      {region:'Middle_East', property:'Sofitel Dubai Downtown',                location:'Dubai, UAE',                  cash_usd:200, pts_per_night:14000, note:'Views of Burj Khalifa; French luxury downtown'},
+      {region:'Middle_East', property:'Raffles Dubai',                         location:'Dubai, UAE',                  cash_usd:300, pts_per_night:20000, note:'Wafi pyramid complex; Raffles butler service'},
+      // Europe
+      {region:'Europe', property:'Sofitel Paris Le Faubourg',                  location:'Paris, France',               cash_usd:450, pts_per_night:28000, note:'Faubourg St-Honoré; steps from the Élysée Palace'},
+      {region:'Europe', property:'Fairmont Monte-Carlo',                       location:'Monaco',                      cash_usd:500, pts_per_night:30000, note:'Casino Square; Monte Carlo grandeur'},
+      {region:'Europe', property:'Sofitel London St James',                    location:'London, UK',                  cash_usd:400, pts_per_night:25000, note:'Opposite Green Park; French luxury in the heart of London'},
+      {region:'Europe', property:'Pullman Barcelona Skipper',                  location:'Barcelona, Spain',            cash_usd:200, pts_per_night:12000, note:'Beachfront on Barceloneta; excellent Accor value'},
+      // North America
+      {region:'North_America', property:'Fairmont Royal York',                 location:'Toronto, Canada',             cash_usd:350, pts_per_night:22000, note:'Grand railway hotel opposite Union Station'},
+      {region:'North_America', property:'Sofitel New York',                    location:'New York, USA',               cash_usd:350, pts_per_night:22000, note:'French luxury on 44th Street; Midtown location'},
+      {region:'North_America', property:'Fairmont San Francisco',              location:'San Francisco, USA',          cash_usd:400, pts_per_night:25000, note:'Nob Hill landmark with sweeping city views'},
+      // Australia & NZ
+      {region:'Australia_NZ', property:'Sofitel Brisbane Central',             location:'Brisbane, Australia',         cash_usd:250, pts_per_night:16000, note:'Chandelier rooms above Brisbane CBD; great base'},
+      {region:'Australia_NZ', property:'Pullman Sydney Hyde Park',             location:'Sydney, Australia',           cash_usd:280, pts_per_night:18000, note:'Hyde Park-facing rooms; excellent central location'},
+    ],
+  },
+  hilton_honors: {
+    free_night_benefit:'5th night free on award stays',
+    spotlight:[
+      // Southeast Asia
+      {region:'Southeast_Asia', property:'Waldorf Astoria Bangkok',            location:'Bangkok, Thailand',           cash_usd:500, pts_per_night:95000, note:"Bangkok's best Hilton; Peacock Alley & top spa"},
+      {region:'Southeast_Asia', property:'Conrad Bali',                        location:'Nusa Dua, Bali',              cash_usd:350, pts_per_night:60000, note:'Lagoon pool villas; premium Bali Hilton base'},
+      {region:'Southeast_Asia', property:'Conrad Bangkok',                     location:'Bangkok, Thailand',           cash_usd:300, pts_per_night:55000, note:'All-suite Conrad in Nana; quieter luxury option'},
+      {region:'Southeast_Asia', property:'Hilton Hanoi Opera',                 location:'Hanoi, Vietnam',              cash_usd:150, pts_per_night:30000, note:'Central location near Hoan Kiem Lake'},
+      // East Asia
+      {region:'East_Asia', property:'Conrad Tokyo',                            location:'Tokyo, Japan',                cash_usd:500, pts_per_night:80000, note:'Shiodome; Tokyo Bay views and world-class spa'},
+      {region:'East_Asia', property:'Waldorf Astoria Seoul Josun',             location:'Seoul, South Korea',          cash_usd:500, pts_per_night:90000, note:'Revived 1914 icon; best hotel in Seoul'},
+      {region:'East_Asia', property:'Conrad Hong Kong',                        location:'Hong Kong',                   cash_usd:450, pts_per_night:75000, note:'Pacific Place, Admiralty; Victoria Harbour views'},
+      // Middle East
+      {region:'Middle_East', property:'Waldorf Astoria Dubai Palm Jumeirah',   location:'Dubai, UAE',                  cash_usd:450, pts_per_night:85000, note:"Beach villas on the Palm; Waldorf's best in Dubai"},
+      {region:'Middle_East', property:'Conrad Abu Dhabi Etihad Towers',        location:'Abu Dhabi, UAE',              cash_usd:300, pts_per_night:55000, note:'Corniche tower views; connected to Etihad HQ'},
+      {region:'Middle_East', property:'Waldorf Astoria Ras Al Khaimah',        location:'Ras Al Khaimah, UAE',         cash_usd:350, pts_per_night:60000, note:'Remote luxury on the UAE coast; outstanding value'},
+      // Europe
+      {region:'Europe', property:'Waldorf Astoria Amsterdam',                  location:'Amsterdam, Netherlands',      cash_usd:600, pts_per_night:95000, note:'Six canal houses; most unique Waldorf in Europe'},
+      {region:'Europe', property:'Conrad London St. James',                    location:'London, UK',                  cash_usd:500, pts_per_night:80000, note:'St. James neighbourhood; exceptional service'},
+      {region:'Europe', property:'Waldorf Astoria Rome Cavalieri',             location:'Rome, Italy',                 cash_usd:450, pts_per_night:75000, note:'Hilltop villa with Michelin restaurant; best Rome views'},
+      // North America
+      {region:'North_America', property:'Waldorf Astoria New York',            location:'New York, USA',               cash_usd:900, pts_per_night:100000, note:'The original Waldorf; Park Avenue landmark since 1931'},
+      {region:'North_America', property:'Conrad New York Downtown',            location:'New York, USA',               cash_usd:450, pts_per_night:70000, note:'Battery Park City; Hudson River views'},
+      {region:'North_America', property:'Waldorf Astoria Las Vegas',           location:'Las Vegas, USA',              cash_usd:400, pts_per_night:60000, note:'No resort fee on awards; heart of the Strip'},
+      // Australia & NZ
+      {region:'Australia_NZ', property:'Hilton Sydney',                        location:'Sydney, Australia',           cash_usd:300, pts_per_night:50000, note:'Elizabeth Street; walking distance to Circular Quay'},
+      {region:'Australia_NZ', property:'DoubleTree by Hilton Melbourne',       location:'Melbourne, Australia',        cash_usd:200, pts_per_night:35000, note:'Flinders Lane; great value in Melbourne CBD'},
+    ],
+  },
+};
+
+const USD_TO_INR = 84;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function cardPointsForPartnerPoints(partnerPtsNeeded, m) {
+  const raw  = (partnerPtsNeeded / m.pp) * m.cp;
+  return Math.ceil(raw / m.mult) * m.mult;
+}
+
+function getRecommendations(cardId, pointsBal, destRegion, tripDays, travelers, opts) {
+  const { recType='both', cabinPref=null, country=null, city=null } = opts || {};
+  const card     = CARDS.find(c => c.id === cardId);
+  const mappings = MAPPINGS.filter(m => m.card === cardId);
+  const baseVpp  = card.baseline.vpp;
+  const results  = [];
+
+  for (const m of mappings) {
+    const partner = PARTNERS.find(p => p.id === m.partner);
+    if (!partner) continue;
+
+    // Rec-type filter
+    if (partner.type === 'airline' && recType === 'stay')   continue;
+    if (partner.type === 'hotel'   && recType === 'flight') continue;
+
+    // Validate minimum transfer
+    if (pointsBal < m.min) continue;
+
+    // Partner miles after transfer
+    const validBal      = Math.floor(pointsBal / m.mult) * m.mult;
+    const partnerMiles  = Math.floor((validBal / m.cp) * m.pp);
+
+    // ── AIRLINE ──────────────────────────────────────────────────────
+    if (partner.type === 'airline') {
+      const chart = AIRLINE_CHARTS[partner.id] || [];
+      const routes = chart.filter(r =>
+        r.region === destRegion && (!cabinPref || r.cabin === cabinPref)
+      );
+
+      for (const route of routes) {
+        if (!routesMatchCountry(route.routes||[], country)) continue;
+        const avgVal = (partner.val||{})[route.cabin] || 1.0;
+
+        // Round-trip
+        if (route.rt) {
+          const milesRT = route.rt * travelers;
+          if (partnerMiles >= milesRT) {
+            const cardPts = cardPointsForPartnerPoints(milesRT, m);
+            if (cardPts <= pointsBal) {
+              const cashVal = Math.round(milesRT * avgVal);
+              const vpp     = +(cashVal / cardPts).toFixed(4);
+              const dispRoutes = (route.routes||[])
+          .filter(r2 => routesMatchCountry([r2], country))
+          .filter(r2 => { if (!city) return true; const o = r2.split('-')[0].trim().match(/^([A-Z]{3})/); return !o || o[1] === city; });
+              results.push({ type:'airline', partner, mapping:m, direction:'round_trip', cabin:route.cabin, milesReq:milesRT, routes:dispRoutes, routeNote:route.note||null, cardPts, cashVal, vpp, vsB:+(vpp/baseVpp).toFixed(2), leftover:pointsBal-cardPts });
+            }
+          }
+        }
+        // One-way
+        if (route.ow) {
+          const milesOW = route.ow * travelers;
+          if (partnerMiles >= milesOW) {
+            const cardPts = cardPointsForPartnerPoints(milesOW, m);
+            if (cardPts <= pointsBal) {
+              const cashVal = Math.round(milesOW * avgVal);
+              const vpp     = +(cashVal / cardPts).toFixed(4);
+              const dispRoutesOW = (route.routes||[])
+          .filter(r2 => routesMatchCountry([r2], country))
+          .filter(r2 => { if (!city) return true; const o = r2.split('-')[0].trim().match(/^([A-Z]{3})/); return !o || o[1] === city; });
+              results.push({ type:'airline', partner, mapping:m, direction:'one_way', cabin:route.cabin, milesReq:milesOW, routes:dispRoutesOW, routeNote:route.note||null, cardPts, cashVal, vpp, vsB:+(vpp/baseVpp).toFixed(2), leftover:pointsBal-cardPts });
+            }
+          }
+        }
+      }
+    }
+
+    // ── HOTEL ─────────────────────────────────────────────────────────
+    if (partner.type === 'hotel') {
+      const chart = HOTEL_CHARTS[partner.id];
+      if (!chart) continue;
+
+      for (const prop of (chart.spotlight||[]).filter(p => (!p.region || p.region === destRegion) && (!country || p.location.includes(country)))) {
+        const nights  = Math.min(Math.floor(partnerMiles / prop.pts_per_night), tripDays);
+        if (nights < 1) continue;
+        const ptsNeed = prop.pts_per_night * nights;
+        const cardPts = cardPointsForPartnerPoints(ptsNeed, m);
+        if (cardPts > pointsBal) continue;
+        const cashVal = Math.round(prop.cash_usd * USD_TO_INR * nights);
+        const vpp     = +(cashVal / cardPts).toFixed(4);
+        results.push({ type:'hotel', partner, mapping:m, property:prop.property, location:prop.location, nights, ptsPerNight:prop.pts_per_night, ptsNeed, freeBenefit:chart.free_night_benefit||null, propNote:prop.note||null, cardPts, cashVal, vpp, vsB:+(vpp/baseVpp).toFixed(2), leftover:pointsBal-cardPts });
+      }
+    }
+  }
+
+  // Baseline
+  const baseTotal = Math.round(pointsBal * baseVpp);
+  results.push({ type:'baseline', partner:null, mapping:null, method:card.baseline.method, methodNote:card.baseline.note, cardPts:pointsBal, cashVal:baseTotal, vpp:baseVpp, vsB:1.0, leftover:0 });
+
+  // Sort by vpp desc, de-dupe
+  results.sort((a,b) => b.vpp - a.vpp);
+  const seen = new Set(), ranked = [];
+  let rank = 1;
+  for (const r of results) {
+    const key = r.type==='airline' ? `${r.partner.id}::${r.cabin}::${r.direction}` : r.type==='hotel' ? `${r.partner.id}::${r.property}` : 'baseline';
+    if (seen.has(key)) continue;
+    seen.add(key); r.rank = rank++; ranked.push(r);
+  }
+  return { card, pointsBal, destRegion, tripDays, travelers, baseVpp, baseTotal, ranked };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BANK COLOURS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BANK_COLOR = { 'HDFC Bank':'#004C8F','ICICI Bank':'#B02A30','American Express':'#2E77BC','HSBC Bank':'#DB0011','Axis Bank':'#97144D' };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI STATE & CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+let selectedCard    = 'hdfc_infinia';
+let selectedRecType = 'flight';
+let selectedCity    = 'BOM';
+let selectedCabin   = 'business';
+let selectedRegion  = 'Southeast_Asia';
+let selectedCountry = null;
+
+const CITIES = [
+  {id:'BOM',label:'Mumbai'}, {id:'DEL',label:'Delhi'}, {id:'BLR',label:'Bengaluru'},
+  {id:'MAA',label:'Chennai'},{id:'CCU',label:'Kolkata'},{id:'HYD',label:'Hyderabad'},
+];
+
+const CABINS = [
+  {id:'economy',label:'Economy'}, {id:'business',label:'Business'}, {id:'first',label:'First Class'},
+];
+
+const REGIONS = [
+  {id:'Southeast_Asia',label:'Southeast Asia', icon:'🌏', countries:['Vietnam','Thailand','Singapore','Indonesia','Malaysia','Philippines','Cambodia']},
+  {id:'East_Asia',     label:'East Asia',      icon:'🗾', countries:['Japan','South Korea','China','Hong Kong','Taiwan']},
+  {id:'Middle_East',   label:'Middle East',    icon:'🕌', countries:['UAE','Qatar','Saudi Arabia','Kuwait','Bahrain','Oman']},
+  {id:'Europe',        label:'Europe',         icon:'🏰', countries:['UK','France','Germany','Italy','Spain','Switzerland','Netherlands','Portugal','Greece']},
+  {id:'North_America', label:'North America',  icon:'🗽', countries:['USA','Canada']},
+  {id:'Australia_NZ',  label:'Australia & NZ', icon:'🦘', countries:['Australia','New Zealand']},
+];
+
+const COUNTRY_AIRPORTS = {
+  'Vietnam':      ['SGN','HAN','DAD','HPH','VCK'],
+  'Thailand':     ['BKK','DMK','HKT','CNX','USM'],
+  'Singapore':    ['SIN'],
+  'Indonesia':    ['CGK','DPS','SUB','MES'],
+  'Malaysia':     ['KUL','LGK','PEN','BKI'],
+  'Philippines':  ['MNL','CEB','ILO','DVO'],
+  'Cambodia':     ['PNH','REP'],
+  'Japan':        ['NRT','HND','KIX','ITM','CTS','FUK','NGO'],
+  'South Korea':  ['ICN','GMP','PUS','CJU'],
+  'China':        ['PEK','PVG','CAN','CTU','CKG','XIY','KMG'],
+  'Hong Kong':    ['HKG'],
+  'Taiwan':       ['TPE','KHH','RMQ'],
+  'UAE':          ['DXB','AUH','SHJ'],
+  'Qatar':        ['DOH'],
+  'Saudi Arabia': ['RUH','JED','DMM'],
+  'Kuwait':       ['KWI'],
+  'Bahrain':      ['BAH'],
+  'Oman':         ['MCT','SLL'],
+  'UK':           ['LHR','LGW','MAN','EDI','BHX','STN'],
+  'France':       ['CDG','ORY','LYS','NCE','MRS'],
+  'Germany':      ['FRA','MUC','DUS','BER','HAM','STR'],
+  'Italy':        ['FCO','MXP','LIN','VCE','NAP','BGY'],
+  'Spain':        ['MAD','BCN','AGP','PMI','VLC','SVQ'],
+  'Switzerland':  ['ZRH','ZUR','GVA','BSL'],
+  'Netherlands':  ['AMS','RTM','EIN'],
+  'Portugal':     ['LIS','OPO','FAO'],
+  'Greece':       ['ATH','HER','SKG','RHO','CFU'],
+  'USA':          ['JFK','EWR','ORD','LAX','SFO','MIA','IAD','SEA','BOS','DFW','DEN','LAS','ATL','DTW','MSP','IAH','PHX','MCO'],
+  'Canada':       ['YYZ','YVR','YUL','YEG','YYC','YHZ'],
+  'Australia':    ['SYD','MEL','BNE','PER','ADL','CBR','DRW'],
+  'New Zealand':  ['AKL','CHC','WLG','ZQN','HLZ'],
+};
+
+// Returns true if at least one route in the array has a destination airport in the given country.
+// If routes is empty, or no country is selected, always returns true.
+function routesMatchCountry(routes, country) {
+  if (!country || !routes || !routes.length) return true;
+  const codes = COUNTRY_AIRPORTS[country];
+  if (!codes || !codes.length) return true;   // unknown country — don't filter
+  return routes.some(r => {
+    // Extract last IATA code from strings like 'BOM-SIN-SGN (biz)' or 'DEL-SGN direct'
+    const parts = r.split('-');
+    const dest  = parts[parts.length - 1].trim().match(/^([A-Z]{3})/);
+    return dest && codes.includes(dest[1]);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CARD SELECTOR UI
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderCardSelector() {
+  document.getElementById('card-selector').innerHTML = CARDS.map(c => `
+    <div class="card-option ${c.id===selectedCard?'active':''}" onclick="pickCard('${c.id}')">
+      <div class="bank-badge" style="background:${BANK_COLOR[c.bank]||'#333'}">${c.bank.split(' ')[0].substring(0,5).toUpperCase()}</div>
+      <div class="card-info">
+        <div class="card-info-name">${c.full_name}</div>
+        <div class="card-info-sub">${c.tier} · ${c.points_currency.name}</div>
+      </div>
+      <div class="card-radio"></div>
+    </div>`).join('');
+}
+function pickCard(id) { selectedCard = id; renderCardSelector(); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REC TYPE TOGGLE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function pickRecType(type) {
+  selectedRecType = type;
+  ['flight','stay','both'].forEach(t => {
+    document.getElementById(`tbtn-${t}`).classList.toggle('active', t === type);
+  });
+  document.getElementById('flight-options-section').style.display = (type === 'stay') ? 'none' : 'block';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CITY SELECTOR
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderCitySelector() {
+  document.getElementById('city-selector').innerHTML = CITIES.map(c =>
+    `<button class="pill-opt ${c.id===selectedCity?'active':''}" onclick="pickCity('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+function pickCity(id) { selectedCity = id; renderCitySelector(); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CABIN SELECTOR
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderCabinSelector() {
+  document.getElementById('cabin-selector').innerHTML = CABINS.map(c =>
+    `<button class="pill-opt ${c.id===selectedCabin?'active':''}" onclick="pickCabin('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+function pickCabin(id) { selectedCabin = id; renderCabinSelector(); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REGION SELECTOR
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderRegionSelector() {
+  document.getElementById('region-selector').innerHTML = REGIONS.map(r =>
+    `<button class="region-card ${r.id===selectedRegion?'active':''}" onclick="pickRegion('${r.id}')">
+      <div class="region-emoji">${r.icon}</div>
+      <div class="region-label">${r.label}</div>
+    </button>`
+  ).join('');
+}
+function pickRegion(id) {
+  selectedRegion  = id;
+  selectedCountry = null;
+  renderRegionSelector();
+  renderCountrySelector();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COUNTRY SELECTOR
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderCountrySelector() {
+  const region = REGIONS.find(r => r.id === selectedRegion);
+  if (!region || !region.countries.length) {
+    document.getElementById('country-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('country-label').textContent = `Which part of ${region.label}? (optional)`;
+  document.getElementById('country-section').style.display = 'block';
+  document.getElementById('country-selector').innerHTML = region.countries.map(c =>
+    `<button class="country-chip ${c===selectedCountry?'active':''}" onclick="pickCountry('${c}')">${c}</button>`
+  ).join('');
+}
+function pickCountry(c) {
+  selectedCountry = (selectedCountry === c) ? null : c;
+  renderCountrySelector();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FORM SUBMIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+function handleSubmit() {
+  const pts  = parseInt(document.getElementById('pts-input').value);
+  const days = parseInt(document.getElementById('days-input').value);
+  const pax  = parseInt(document.getElementById('travelers-input').value);
+  const err  = document.getElementById('form-error');
+  err.style.display = 'none';
+  if (!pts  || pts < 1000)  { err.textContent='Please enter a valid points balance (min 1,000).'; err.style.display='block'; return; }
+  if (!days || days < 1)    { err.textContent='Please enter a valid trip duration.'; err.style.display='block'; return; }
+  if (!pax  || pax < 1)     { err.textContent='Please enter a valid number of travellers.'; err.style.display='block'; return; }
+  if (!selectedRegion)      { err.textContent='Please select a destination region.'; err.style.display='block'; return; }
+
+  const result = getRecommendations(selectedCard, pts, selectedRegion, days, pax || 1,
+    { recType: selectedRecType, cabinPref: selectedCabin, country: selectedCountry, city: selectedCity });
+  renderResults(result);
+  document.getElementById('input-screen').style.display   = 'none';
+  document.getElementById('results-screen').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function showInput() {
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('input-screen').style.display   = 'block';
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RESULTS RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+
+const DEST_LABEL = { Southeast_Asia:'Southeast Asia', East_Asia:'East Asia', Middle_East:'Middle East', Europe:'Europe', North_America:'North America', Australia_NZ:'Australia & NZ' };
+const fmt  = n  => n != null ? n.toLocaleString('en-IN') : '—';
+const inr  = n  => n != null ? '₹' + Math.round(n).toLocaleString('en-IN') : '—';
+const vppF = v  => v != null ? '₹' + (+v).toFixed(2) : '—';
+
+function vppClass(vsB) { return vsB>=1.5?'excellent':vsB>1.0?'good':vsB===1.0?'baseline':'below'; }
+
+function verifiedBadge(ver) {
+  if (!ver) return '';
+  const d     = new Date(ver);
+  const now   = new Date();
+  const days  = Math.floor((now - d) / 86400000);
+  const label = d.toLocaleDateString('en-IN', {month:'short', year:'numeric'});
+  if (days <= 90)  return `<span class="verified-badge verified-fresh">✓ Verified ${label}</span>`;
+  if (days <= 180) return `<span class="verified-badge verified-ok">⚠ Verified ${label} — confirm ratio</span>`;
+  return               `<span class="verified-badge verified-stale">⚠ Last verified ${label} — check before transferring</span>`;
+}
+function vsBadge(vsB, prefix='') {
+  if (vsB==null) return '';
+  if (vsB>=1.5) return `<span class="vs-badge vs-up">⭐ ${prefix}${((vsB-1)*100).toFixed(0)}% above portal</span>`;
+  if (vsB>1.0)  return `<span class="vs-badge vs-up">↑ ${prefix}${((vsB-1)*100).toFixed(0)}% above portal</span>`;
+  if (vsB===1.0)return `<span class="vs-badge vs-same">Portal baseline</span>`;
+  return         `<span class="vs-badge vs-down">↓ ${((1-vsB)*100).toFixed(0)}% below portal</span>`;
+}
+function rankCls(r) { return r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n'; }
+
+function buildAirlineSteps(r, card) {
+  const abbr = card.points_currency.abbreviation;
+  return [
+    `Transfer <strong>${fmt(r.cardPts)} ${abbr}</strong> to ${r.partner.name} (${r.mapping.desc})`,
+    `Wait <strong>${r.mapping.time}</strong> for miles to appear in your loyalty account`,
+    `Log into ${r.partner.name} and search for a <strong>${r.direction==='round_trip'?'round-trip':'one-way'} ${r.cabin} class saver award</strong>`,
+    r.routes.length ? `Try these routings: <strong>${r.routes.join(' · ')}</strong>` : 'Search for saver award availability from India to your destination',
+    `Book the award — <strong>${fmt(r.milesReq)} miles</strong> required (plus taxes &amp; surcharges paid separately)`,
+  ];
+}
+function buildHotelSteps(r, card) {
+  const abbr = card.points_currency.abbreviation;
+  return [
+    `Transfer <strong>${fmt(r.cardPts)} ${abbr}</strong> to ${r.partner.name} (${r.mapping.desc})`,
+    `Wait <strong>${r.mapping.time}</strong> for points to appear`,
+    `Search for award availability at <strong>${r.property}</strong> on the ${r.partner.name} app or website`,
+    `Book <strong>${r.nights} award night(s)</strong> — ${fmt(r.ptsNeed)} points required`,
+    r.freeBenefit ? `Tip: ${r.freeBenefit} — plan your stay length to take advantage` : null,
+  ].filter(Boolean);
+}
+
+function recCard(r, data) {
+  const card  = data.card;
+  const abbr  = card.points_currency.abbreviation;
+  const vppCls = vppClass(r.vsB);
+  const typePill = r.type==='airline' ? '<span class="type-pill pill-airline">✈ Airline Award</span>'
+                 : r.type==='hotel'   ? '<span class="type-pill pill-hotel">🏨 Hotel Award</span>'
+                 :                      '<span class="type-pill pill-baseline">🏦 Direct Redemption</span>';
+
+  // Detail rows
+  let details = '';
+  let steps   = [];
+  let note    = r.routeNote || r.propNote || r.mapping?.note || '';
+
+  if (r.type === 'airline') {
+    details = `
+      <div class="detail-item"><div class="detail-lbl">Direction</div><div class="detail-val">${r.direction==='round_trip'?'Round-trip':'One-way'}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Cabin</div><div class="detail-val">${r.cabin.charAt(0).toUpperCase()+r.cabin.slice(1)} Class</div></div>
+      <div class="detail-item"><div class="detail-lbl">Miles Required</div><div class="detail-val">${fmt(r.milesReq)}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Transfer Ratio</div><div class="detail-val">${r.mapping.desc}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Processing Time</div><div class="detail-val">${r.mapping.time}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Card Points Used</div><div class="detail-val">${fmt(r.cardPts)} ${abbr}</div></div>
+      ${r.routes.length ? `<div class="detail-item" style="grid-column:1/-1"><div class="detail-lbl">Example Routes</div><div class="detail-val full">${r.routes.join(' &nbsp;·&nbsp; ')}</div></div>` : ''}
+      <div class="detail-item" style="grid-column:1/-1"><div class="detail-lbl">Ratio Last Verified</div><div class="detail-val">${verifiedBadge(r.mapping.ver)}</div></div>
+    `;
+    steps = buildAirlineSteps(r, card);
+  } else if (r.type === 'hotel') {
+    details = `
+      <div class="detail-item"><div class="detail-lbl">Property</div><div class="detail-val">${r.property}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Location</div><div class="detail-val">${r.location}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Award Nights</div><div class="detail-val">${r.nights} night(s)</div></div>
+      <div class="detail-item"><div class="detail-lbl">Points / Night</div><div class="detail-val">${fmt(r.ptsPerNight)}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Transfer Ratio</div><div class="detail-val">${r.mapping.desc}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Processing Time</div><div class="detail-val">${r.mapping.time}</div></div>
+      <div class="detail-item"><div class="detail-lbl">Card Points Used</div><div class="detail-val">${fmt(r.cardPts)} ${abbr}</div></div>
+      ${r.freeBenefit ? `<div class="detail-item" style="grid-column:1/-1"><div class="detail-lbl">Free Night Benefit</div><div class="detail-val full" style="color:var(--green)">🎁 ${r.freeBenefit}</div></div>` : ''}
+      <div class="detail-item" style="grid-column:1/-1"><div class="detail-lbl">Ratio Last Verified</div><div class="detail-val">${verifiedBadge(r.mapping.ver)}</div></div>
+    `;
+    steps = buildHotelSteps(r, card);
+  } else {
+    details = `<div class="detail-item" style="grid-column:1/-1"><div class="detail-lbl">Method</div><div class="detail-val">${r.method}</div></div>`;
+    steps   = [`Log in to your ${card.bank} rewards portal`, r.method];
+    note    = r.methodNote || '';
+  }
+
+  const uid = `r${r.rank}`;
+  return `
+    <div class="rec-card">
+      <div class="rec-header">
+        <div class="rank-circle ${rankCls(r.rank)}">${r.rank}</div>
+        <div class="rec-partner-info">
+          <div class="rec-partner-name">${r.type==='baseline'?`${card.bank} Portal`:(r.partner?.name||'')}</div>
+          ${typePill}
+        </div>
+        <div class="rec-value">
+          <div class="vpp-number vpp-${vppCls}">${vppF(r.vpp)}</div>
+          <div class="vpp-label">per ${abbr}</div>
+          ${vsBadge(r.vsB)}
+        </div>
+      </div>
+      <div class="rec-body">
+        ${note ? `<div class="note-box">💡 ${note}</div>` : ''}
+        <div class="detail-grid">${details}</div>
+        ${r.cashVal ? `
+          <div class="detail-grid" style="margin-top:-4px;margin-bottom:14px">
+            <div class="detail-item"><div class="detail-lbl">Estimated Cash Value</div><div class="detail-val accent">${inr(r.cashVal)}</div></div>
+            <div class="detail-item"><div class="detail-lbl">Leftover ${abbr}</div><div class="detail-val">${fmt(r.leftover)} ${abbr}</div></div>
+          </div>` : ''}
+        <button class="steps-btn" id="btn-${uid}" onclick="toggleSteps('${uid}')">▶ &nbsp;How to redeem — step by step</button>
+        <ul class="steps-list" id="list-${uid}">
+          ${steps.map((s,i)=>`<li><div class="step-num">${i+1}</div><span>${s}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>`;
+}
+
+function renderResults(data) {
+  const q    = data;
+  const top  = q.ranked[0];
+  const card = q.card;
+
+  let summaryHTML = '';
+  if (top.type === 'baseline') {
+    summaryHTML = `No transfer partner beats direct portal redemption for this query. Best option: redeem via ${card.bank} portal at <strong>${vppF(q.baseVpp)}/point</strong> for <strong>${inr(q.baseTotal)}</strong> total.`;
+  } else {
+    const uplift = top.vsB ? `<strong>${((top.vsB-1)*100).toFixed(0)}% more value</strong>` : '';
+    const target = top.type==='airline'
+      ? `<strong>${top.cabin} class ${top.direction.replace('_','-')} flights</strong> via ${top.partner.name}`
+      : `<strong>${top.nights} night(s) at ${top.property}</strong> via ${top.partner.name}`;
+    summaryHTML = `Best use of your ${card.points_currency.abbreviation}: ${target}. Estimated <strong>${vppF(top.vpp)}/point</strong> — ${uplift} than redeeming on the portal (${inr(q.baseTotal)} total at ${vppF(q.baseVpp)}/point).`;
+  }
+
+  document.getElementById('results-content').innerHTML = `
+    <div class="query-card">
+      <div class="query-card-title">${card.full_name}</div>
+      <div class="query-pills">
+        <span class="query-pill"><strong>${fmt(q.pointsBal)}</strong> ${card.points_currency.abbreviation}</span>
+        <span class="query-pill"><strong>${DEST_LABEL[q.destRegion]||q.destRegion}</strong></span>
+        <span class="query-pill"><strong>${q.tripDays}</strong> days</span>
+        <span class="query-pill"><strong>${q.travelers}</strong> traveller${q.travelers>1?'s':''}</span>
+        <span class="query-pill">Portal value: <strong>${vppF(q.baseVpp)}/pt</strong></span>
+      </div>
+    </div>
+
+    <div class="summary-box">${summaryHTML}</div>
+
+    <div class="section-header">${q.ranked.length} Redemption Options — Ranked by Value per Point</div>
+
+    ${q.ranked.map(r => recCard(r, data)).join('')}
+  `;
+}
+
+function toggleSteps(uid) {
+  const list = document.getElementById(`list-${uid}`);
+  const btn  = document.getElementById(`btn-${uid}`);
+  const open = list.classList.toggle('open');
+  btn.innerHTML = open ? '▼  Hide steps' : '▶  How to redeem — step by step';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+renderCardSelector();
+renderCitySelector();
+renderCabinSelector();
+renderRegionSelector();
+renderCountrySelector();
+</script>
+  <a class="feedback-fab"
+     href="mailto:ajinkya.khot22@gmail.com?subject=Feedback%3A%20CC%20Redemption%20Helper&body=Hi%2C%0A%0ACard%20I%20tested%3A%20%0ARegion%2FCountry%3A%20%0AWhat%20worked%20well%3A%20%0AWhat%20was%20confusing%20or%20wrong%3A%20%0AOther%20suggestions%3A%20"
+     title="Send feedback">
+    💬 Give Feedback
+  </a>
+</body>
+</html>
