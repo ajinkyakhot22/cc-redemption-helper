@@ -351,6 +351,73 @@
       .form-card      { padding: 24px 18px; }
     }
   
+    /* ── TRIP MODE TOGGLE ── */
+    .mode-toggle {
+      display:flex; border-bottom:2px solid var(--gray-200);
+      margin:0 -32px 24px; padding:0 32px;
+    }
+    .mode-btn {
+      flex:1; padding:12px 8px; border:none; background:none; cursor:pointer;
+      font-size:14px; font-weight:700; color:var(--gray-400);
+      border-bottom:3px solid transparent; margin-bottom:-2px;
+      transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .mode-btn:hover  { color:var(--navy-light); }
+    .mode-btn.active { color:var(--navy); border-bottom-color:var(--navy); }
+
+    /* ── DOMESTIC ROUTE GRID ── */
+    .dom-route-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .dom-route-btn {
+      padding:11px 12px; border:2px solid var(--gray-200);
+      border-radius:10px; background:var(--white); cursor:pointer;
+      font-size:13px; font-weight:600; color:var(--gray-700);
+      text-align:left; transition:all 0.15s; line-height:1.3;
+    }
+    .dom-route-btn:hover  { border-color:var(--navy-light); background:#f5f7ff; }
+    .dom-route-btn.active { border-color:var(--navy); background:#eef1f9; color:var(--navy); }
+    .dom-route-dist { font-size:10px; font-weight:600; text-transform:uppercase;
+      color:var(--gray-400); letter-spacing:0.5px; margin-top:3px; }
+
+    /* ── DOMESTIC RESULTS ── */
+    .dom-result-header {
+      background:linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      color:white; border-radius:16px; padding:20px 22px; margin-bottom:16px;
+      box-shadow:0 4px 16px rgba(15,26,62,0.30);
+    }
+    .dom-result-route { font-size:18px; font-weight:800; }
+    .dom-result-meta  { font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px; }
+    .dom-result-cash  { font-size:13px; color:rgba(255,255,255,0.9); margin-top:8px; font-weight:600; }
+
+    .dom-option {
+      background:white; border:2px solid var(--gray-200); border-radius:12px;
+      margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow-sm);
+    }
+    .dom-option-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:13px 16px;
+    }
+    .dom-option-label { font-size:14px; font-weight:700; color:var(--gray-900); }
+    .dom-option-sub   { font-size:12px; color:var(--gray-600); margin-top:2px; }
+    .dom-option-body  { padding:13px 16px; border-top:1px solid var(--gray-100); }
+    .dom-option.winner { border-color:var(--green); }
+    .dom-option.winner .dom-option-head { background:var(--green-bg); }
+    .dom-winner-badge {
+      background:var(--green); color:white; flex-shrink:0;
+      font-size:10px; font-weight:800; padding:3px 8px; border-radius:10px;
+      text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .dom-pts-big   { font-size:22px; font-weight:800; color:var(--navy); }
+    .dom-pts-unit  { font-size:12px; color:var(--gray-600); margin-left:4px; }
+    .dom-pts-range { font-size:15px; font-weight:700; color:var(--navy); }
+    .dom-vpp       { font-size:12px; font-weight:600; margin-top:6px; }
+    .dom-cant-afford { font-size:12px; color:var(--red); font-weight:600; margin-top:4px; }
+    .dom-insight {
+      border-radius:10px; padding:13px 16px; margin-bottom:16px;
+      font-size:13px; line-height:1.6; border-left:4px solid;
+    }
+    .dom-insight.good  { background:#dcfce7; border-color:var(--green); color:#166534; }
+    .dom-insight.warn  { background:#fffbeb; border-color:var(--gold); color:#92400e; }
+
     /* ── FEEDBACK BUTTON ── */
     .feedback-fab {
       position: fixed; bottom: 24px; right: 20px; z-index: 999;
@@ -388,6 +455,12 @@
 
   <div class="form-card">
 
+    <!-- Trip mode toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mbtn-international" onclick="pickTripMode('international')">✈ International</button>
+      <button class="mode-btn"        id="mbtn-domestic"      onclick="pickTripMode('domestic')">🇮🇳 Domestic</button>
+    </div>
+
     <!-- Card selector -->
     <div class="form-section-label">Your Credit Card</div>
     <div class="card-options-grid" id="card-selector"></div>
@@ -398,6 +471,9 @@
       <label class="form-label" for="pts-input">Reward Points Available</label>
       <input id="pts-input" class="form-control" type="number" min="1000" step="1000" placeholder="e.g. 150000" value="150000" />
     </div>
+
+    <!-- International only -->
+    <div id="intl-section">
 
     <!-- What are you planning? -->
     <div class="form-section-label">What are you planning?</div>
@@ -424,6 +500,19 @@
       <div class="form-section-label" id="country-label">Which country?</div>
       <div class="country-row" id="country-selector"></div>
     </div>
+
+    </div><!-- /intl-section -->
+
+    <!-- Domestic only -->
+    <div id="domestic-section" style="display:none">
+      <div class="form-section-label">Cabin Class</div>
+      <div class="toggle-group" style="margin-bottom:20px">
+        <button class="toggle-btn active" id="dcbn-economy"  onclick="pickDomCabin('economy')">Economy</button>
+        <button class="toggle-btn"        id="dcbn-business" onclick="pickDomCabin('business')">Business</button>
+      </div>
+      <div class="form-section-label">Route</div>
+      <div class="dom-route-grid" id="domestic-route-selector"></div>
+    </div><!-- /domestic-section -->
 
     <!-- Trip details -->
     <div class="form-section-label">Trip Details</div>
@@ -1198,11 +1287,33 @@ function getRecommendations(cardId, pointsBal, destRegion, tripDays, travelers, 
 // BANK COLOURS
 // ═══════════════════════════════════════════════════════════════════════════
 
+const DOMESTIC_ROUTES = [
+  // Short haul — approx 7,000–11,000 Maharaja Points economy
+  { id:'bom_ahm', label:'Mumbai ↔ Ahmedabad',  dist:'short',  distLabel:'~55 min',   ecoPts:[7000,11000],  bizPts:[11000,17000], cashEco:3500, cashBiz:8000,  note:'High-frequency short hop.' },
+  { id:'del_jpr', label:'Delhi ↔ Jaipur',       dist:'short',  distLabel:'~45 min',   ecoPts:[7000,11000],  bizPts:[11000,17000], cashEco:3000, cashBiz:7000,  note:'Very short hop — often cheaper by road.' },
+  { id:'blr_goa', label:'Bengaluru ↔ Goa',      dist:'short',  distLabel:'~55 min',   ecoPts:[7000,11000],  bizPts:[11000,17000], cashEco:4000, cashBiz:9000,  note:'Popular weekend getaway route.' },
+  // Medium haul — approx 10,000–16,000 Maharaja Points economy
+  { id:'del_bom', label:'Delhi ↔ Mumbai',        dist:'medium', distLabel:'~2h',       ecoPts:[10000,16000], bizPts:[17000,26000], cashEco:7000, cashBiz:14000, note:'Most popular domestic route. Very high frequency.' },
+  { id:'del_hyd', label:'Delhi ↔ Hyderabad',     dist:'medium', distLabel:'~2h 15m',   ecoPts:[10000,16000], bizPts:[17000,26000], cashEco:6000, cashBiz:13000, note:'Major business corridor.' },
+  { id:'del_col', label:'Delhi ↔ Kolkata',       dist:'medium', distLabel:'~2h 20m',   ecoPts:[10000,16000], bizPts:[17000,26000], cashEco:5500, cashBiz:12000, note:'Strong Air India presence.' },
+  { id:'bom_blr', label:'Mumbai ↔ Bengaluru',    dist:'medium', distLabel:'~1h 45m',   ecoPts:[10000,16000], bizPts:[17000,26000], cashEco:5500, cashBiz:12000, note:'Tech corridor — very frequent.' },
+  { id:'bom_maa', label:'Mumbai ↔ Chennai',      dist:'medium', distLabel:'~1h 45m',   ecoPts:[10000,16000], bizPts:[17000,26000], cashEco:5500, cashBiz:12000, note:'Established business route.' },
+  // Long haul — approx 14,000–22,000 Maharaja Points economy
+  { id:'del_blr', label:'Delhi ↔ Bengaluru',     dist:'long',   distLabel:'~2h 45m',   ecoPts:[14000,22000], bizPts:[22000,35000], cashEco:7500, cashBiz:16000, note:'Longest popular domestic sector.' },
+  { id:'del_cok', label:'Delhi ↔ Kochi',         dist:'long',   distLabel:'~3h',       ecoPts:[14000,22000], bizPts:[22000,35000], cashEco:8000, cashBiz:17000, note:'Long southbound from Delhi.' },
+  { id:'bom_col', label:'Mumbai ↔ Kolkata',      dist:'long',   distLabel:'~2h 40m',   ecoPts:[14000,22000], bizPts:[22000,35000], cashEco:6500, cashBiz:15000, note:'Cross-country route.' },
+  { id:'del_gau', label:'Delhi ↔ Guwahati',      dist:'long',   distLabel:'~2h 45m',   ecoPts:[14000,22000], bizPts:[22000,35000], cashEco:6500, cashBiz:14000, note:'Northeast gateway.' },
+];
+
 const BANK_COLOR = { 'HDFC Bank':'#004C8F','ICICI Bank':'#B02A30','American Express':'#2E77BC','HSBC Bank':'#DB0011','Axis Bank':'#97144D' };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UI STATE & CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
+
+let tripMode              = 'international';
+let selectedDomesticRoute = 'del_bom';
+let selectedDomesticCabin = 'economy';
 
 let selectedCard    = 'hdfc_infinia';
 let selectedRecType = 'flight';
@@ -1381,11 +1492,16 @@ function handleSubmit() {
   if (!pts  || pts < 1000)  { err.textContent='Please enter a valid points balance (min 1,000).'; err.style.display='block'; return; }
   if (!days || days < 1)    { err.textContent='Please enter a valid trip duration.'; err.style.display='block'; return; }
   if (!pax  || pax < 1)     { err.textContent='Please enter a valid number of travellers.'; err.style.display='block'; return; }
-  if (!selectedRegion)      { err.textContent='Please select a destination region.'; err.style.display='block'; return; }
+  if (tripMode === 'international' && !selectedRegion) { err.textContent='Please select a destination region.'; err.style.display='block'; return; }
 
-  const result = getRecommendations(selectedCard, pts, selectedRegion, days, pax || 1,
-    { recType: selectedRecType, cabinPref: selectedCabin, country: selectedCountry, city: selectedCity });
-  renderResults(result);
+  if (tripMode === 'domestic') {
+    const result = getDomesticRecommendations(selectedCard, pts, selectedDomesticRoute, selectedDomesticCabin, pax || 1);
+    renderDomesticResults(result);
+  } else {
+    const result = getRecommendations(selectedCard, pts, selectedRegion, days, pax || 1,
+      { recType: selectedRecType, cabinPref: selectedCabin, country: selectedCountry, city: selectedCity });
+    renderResults(result);
+  }
   document.getElementById('input-screen').style.display   = 'none';
   document.getElementById('results-screen').style.display = 'block';
   window.scrollTo(0,0);
@@ -1567,6 +1683,162 @@ function toggleSteps(uid) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// DOMESTIC ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function pickTripMode(mode) {
+  tripMode = mode;
+  ['international','domestic'].forEach(m => {
+    document.getElementById(`mbtn-${m}`).classList.toggle('active', m === mode);
+  });
+  document.getElementById('intl-section').style.display     = (mode === 'domestic') ? 'none'  : 'block';
+  document.getElementById('domestic-section').style.display = (mode === 'domestic') ? 'block' : 'none';
+}
+
+function pickDomCabin(cabin) {
+  selectedDomesticCabin = cabin;
+  ['economy','business'].forEach(c => {
+    document.getElementById(`dcbn-${c}`).classList.toggle('active', c === cabin);
+  });
+}
+
+function renderDomesticRouteSelector() {
+  const DIST_LABEL = { short:'Short haul', medium:'Medium haul', long:'Long haul' };
+  document.getElementById('domestic-route-selector').innerHTML = DOMESTIC_ROUTES.map(r => `
+    <button class="dom-route-btn ${r.id===selectedDomesticRoute?'active':''}" onclick="pickDomRoute('${r.id}')">
+      ${r.label}
+      <div class="dom-route-dist">${DIST_LABEL[r.dist]} · ${r.distLabel}</div>
+    </button>`).join('');
+}
+
+function pickDomRoute(id) {
+  selectedDomesticRoute = id;
+  renderDomesticRouteSelector();
+}
+
+function getDomesticRecommendations(cardId, pts, routeId, cabin, pax) {
+  const card  = CARDS.find(c => c.id === cardId);
+  const route = DOMESTIC_ROUTES.find(r => r.id === routeId);
+  if (!card || !route) return null;
+
+  const ptRange   = cabin === 'economy' ? route.ecoPts : route.bizPts;
+  const cashPrice = cabin === 'economy' ? route.cashEco : route.cashBiz;
+  const cashTotal = cashPrice * pax;
+  const baseVpp   = card.baseline.vpp;
+  const options   = [];
+
+  // Option A: Portal booking (SmartBuy / bank rewards portal)
+  const portalPts = Math.ceil(cashTotal / baseVpp / 1000) * 1000;
+  options.push({
+    type:      'portal',
+    label:     card.baseline.method,
+    sub:       card.baseline.note,
+    ptsNeeded: portalPts,
+    vpp:       baseVpp,
+    canAfford: pts >= portalPts,
+  });
+
+  // Option B: Transfer to Air India Maharaja Club (if mapping exists)
+  const mapping = MAPPINGS.find(m => m.card === cardId && m.partner === 'air_india_maharaja_club');
+  if (mapping) {
+    const mult     = mapping.mult || 1000;
+    const cardLow  = Math.ceil(ptRange[0] * pax * mapping.cp / mapping.pp / mult) * mult;
+    const cardHigh = Math.ceil(ptRange[1] * pax * mapping.cp / mapping.pp / mult) * mult;
+    const cardMid  = Math.round((cardLow + cardHigh) / 2 / mult) * mult;
+    const vppMid   = cardMid > 0 ? cashTotal / cardMid : 0;
+    options.push({
+      type:         'transfer',
+      label:        'Air India Maharaja Club (transfer)',
+      sub:          mapping.desc + ' · ' + mapping.time,
+      cardLow, cardHigh, cardMid,
+      milesLow:  ptRange[0] * pax,
+      milesHigh: ptRange[1] * pax,
+      vpp:       vppMid,
+      canAfford: pts >= cardLow,
+      note:      mapping.note || '',
+      transferTime: mapping.time,
+    });
+  }
+
+  // Sort best value first
+  options.sort((a, b) => b.vpp - a.vpp);
+  return { card, route, cabin, pax, pts, cashTotal, baseVpp, options };
+}
+
+const DIST_ICON = { short:'🛫', medium:'✈️', long:'🌐' };
+
+function renderDomesticResults(data) {
+  if (!data) { document.getElementById('results-content').innerHTML = '<p>Error loading results.</p>'; return; }
+  const { card, route, cabin, pax, pts, cashTotal, options } = data;
+  const cabinLabel = cabin === 'economy' ? 'Economy' : 'Business';
+
+  // Insight banner
+  let insightHTML = '';
+  const portal   = options.find(o => o.type === 'portal');
+  const transfer = options.find(o => o.type === 'transfer');
+  if (!transfer) {
+    insightHTML = `<div class="dom-insight warn">${card.full_name} does not have an Air India Maharaja Club transfer partner. Portal redemption is your only option for domestic flights.</div>`;
+  } else if (portal && transfer) {
+    const diff = portal.vpp - transfer.vpp;
+    if (diff > 0.05) {
+      insightHTML = `<div class="dom-insight good"><strong>Portal wins.</strong> Booking via ${card.baseline.method} gives ~₹${portal.vpp.toFixed(2)}/pt vs ~₹${transfer.vpp.toFixed(2)}/pt via Air India transfer. Don't transfer — book directly through the portal.</div>`;
+    } else if (diff < -0.05) {
+      insightHTML = `<div class="dom-insight good"><strong>Transfer wins.</strong> Transferring to Air India Maharaja Club gives ~₹${transfer.vpp.toFixed(2)}/pt vs ~₹${portal.vpp.toFixed(2)}/pt via portal. Note: transfers are irreversible — confirm award availability first.</div>`;
+    } else {
+      insightHTML = `<div class="dom-insight warn"><strong>Roughly equal.</strong> Portal (₹${portal.vpp.toFixed(2)}/pt) and Air India transfer (₹${transfer.vpp.toFixed(2)}/pt) are very close. Prefer the portal — it's instant and risk-free.</div>`;
+    }
+  }
+
+  const optionsHTML = options.map((opt, idx) => {
+    const isWinner = idx === 0;
+    let bodyHTML = '';
+
+    if (opt.type === 'portal') {
+      bodyHTML = `
+        <span class="dom-pts-big">${fmt(opt.ptsNeeded)}</span><span class="dom-pts-unit">${card.points_currency.abbreviation} needed</span>
+        ${!opt.canAfford ? `<div class="dom-cant-afford">⚠ You need ${fmt(opt.ptsNeeded - pts)} more points</div>` : ''}
+        <div class="dom-vpp" style="color:${opt.vpp>=0.75?'var(--green)':'var(--orange)'}">₹${opt.vpp.toFixed(2)}/point · books ticket directly, no transfer risk</div>
+        <div style="font-size:12px;color:var(--gray-600);margin-top:5px">${opt.sub}</div>`;
+    } else {
+      bodyHTML = `
+        <div class="dom-pts-range">${fmt(opt.cardLow)}–${fmt(opt.cardHigh)} ${card.points_currency.abbreviation}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:4px">= ${fmt(opt.milesLow)}–${fmt(opt.milesHigh)} Maharaja Points needed (dynamic pricing)</div>
+        ${!opt.canAfford ? `<div class="dom-cant-afford">⚠ You may be short on points</div>` : ''}
+        <div class="dom-vpp" style="color:${opt.vpp>=0.75?'var(--green)':'var(--orange)'}">~₹${opt.vpp.toFixed(2)}/point (mid-range estimate)</div>
+        <div style="font-size:12px;color:var(--gray-600);margin-top:5px">Transfer time: ${opt.transferTime}</div>
+        ${opt.note ? `<div class="note-box" style="margin-top:10px">${opt.note}</div>` : ''}`;
+    }
+
+    return `
+    <div class="dom-option ${isWinner?'winner':''}">
+      <div class="dom-option-head">
+        <div>
+          <div class="dom-option-label">${opt.label}</div>
+          <div class="dom-option-sub">${opt.sub}</div>
+        </div>
+        ${isWinner ? '<span class="dom-winner-badge">Best value</span>' : ''}
+      </div>
+      <div class="dom-option-body">${bodyHTML}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('results-content').innerHTML = `
+    <div class="dom-result-header">
+      <div class="dom-result-route">${DIST_ICON[route.dist]} ${route.label}</div>
+      <div class="dom-result-meta">${cabinLabel} · Air India · ${pax} traveller${pax>1?'s':''}</div>
+      <div class="dom-result-cash">Cash fare: ~${inr(cashTotal)} (approx avg market rate)</div>
+    </div>
+    ${insightHTML}
+    <div class="section-header">${options.length} option${options.length>1?'s':''} — ranked by value per point</div>
+    ${optionsHTML}
+    <div class="note-box" style="margin-top:12px">
+      ⚠ Air India uses <strong>dynamic award pricing</strong> — Maharaja Points required vary by date and availability. Ranges shown are community-validated approximates for off-peak travel.
+      Always use the <a href="https://www.airindia.com/in/en/maharaja-club/redeem-points.html" target="_blank" style="color:#92400e;font-weight:600">Air India Points Calculator</a> to get exact figures before transferring. <strong>Transfers are irreversible.</strong>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 renderCardSelector();
@@ -1574,6 +1846,7 @@ renderCitySelector();
 renderCabinSelector();
 renderRegionSelector();
 renderCountrySelector();
+renderDomesticRouteSelector();
 </script>
   <a class="feedback-fab"
      href="https://tally.so/r/44dLEX"
