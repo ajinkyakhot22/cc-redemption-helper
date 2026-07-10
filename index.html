@@ -629,7 +629,7 @@ const CARDS = [
   { id:'icici_emeralde',    bank:'ICICI Bank',        full_name:'ICICI Bank Emeralde Credit Card',        tier:'Super Premium', points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'ICICI Rewards portal (vouchers/flights)', note:'1 RP ≈ ₹1 on ICICI portal'} },
   { id:'amex_platinum',     bank:'American Express',  full_name:'American Express Platinum Card',         tier:'Super Premium', points_currency:{name:'Membership Rewards',abbreviation:'MR'}, baseline:{vpp:0.25, method:'Amex Travel portal / statement credit', note:'1 MR ≈ ₹0.25 baseline on Indian Amex portal'} },
   { id:'amex_gold',         bank:'American Express',  full_name:'American Express Gold Card',             tier:'Premium',       points_currency:{name:'Membership Rewards',abbreviation:'MR'}, baseline:{vpp:0.25, method:'Amex portal', note:'Same MR pool as Platinum. 1 MR ≈ ₹0.25'} },
-  { id:'hsbc_premier',      bank:'HSBC Bank',         full_name:'HSBC Premier Credit Card',              tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'Apple Store / merchandise redemption', note:'1 RP ≈ ₹1 via Apple Store redemption'} },
+  { id:'hsbc_premier',      bank:'HSBC Bank',         full_name:'HSBC Premier Credit Card',              tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},       baseline:{vpp:1.00, method:'HSBC Rewards portal (Apple Store, merchandise, vouchers)', note:'1 RP ≈ ₹1 via HSBC Rewards portal. Redeem for Apple products, e-vouchers, or merchandise.'} },
   { id:'axis_magnus',       bank:'Axis Bank',         full_name:'Axis Bank Magnus Credit Card',          tier:'Super Premium', points_currency:{name:'Edge Miles',abbreviation:'EM'},          baseline:{vpp:0.20, method:'Axis Edge portal', note:'1 EM ≈ ₹0.20'} },
   { id:'hdfc_regalia_gold', bank:'HDFC Bank',  full_name:'HDFC Bank Regalia Gold Credit Card', tier:'Premium',       points_currency:{name:'Reward Points',abbreviation:'RP'},  baseline:{vpp:0.50, method:'HDFC SmartBuy portal', note:'1 RP = ₹0.50 on SmartBuy (vs ₹1 for Infinia/Diners)'} },
   { id:'axis_atlas',        bank:'Axis Bank',  full_name:'Axis Bank Atlas Credit Card',         tier:'Premium',       points_currency:{name:'EDGE Miles',abbreviation:'EM'},     baseline:{vpp:0.40, method:'Axis Travel Edge portal', note:'1 EM ≈ ₹0.40. Card discontinued — no new applications.'} },
@@ -1162,6 +1162,7 @@ const HOTEL_CHARTS = {
       {region:'Southeast_Asia', property:'InterContinental Bangkok',                    location:'Bangkok, Thailand',     cash_usd:250, pts_per_night:45000, note:'Ploenchit; ideal for shopping and BTS access'},
       // East Asia
       {region:'East_Asia', property:'InterContinental Tokyo Bay',                       location:'Tokyo, Japan',          cash_usd:300, pts_per_night:55000, note:'Waterfront views; convenient for Odaiba & Shimbashi'},
+      {region:'East_Asia', property:'ANA Crowne Plaza Osaka',                           location:'Osaka, Japan',          cash_usd:220, pts_per_night:40000, note:'Namba district; best IHG value in Osaka'},
       {region:'East_Asia', property:'Regent Hong Kong',                                 location:'Hong Kong',              cash_usd:600, pts_per_night:90000, note:'Iconic harbour views; IHG ultra-premium brand'},
       {region:'East_Asia', property:'InterContinental Seoul',                           location:'Seoul, South Korea',    cash_usd:280, pts_per_night:50000, note:'Gangnam; well-located for business and leisure'},
       // Middle East
@@ -1191,6 +1192,7 @@ const HOTEL_CHARTS = {
       {region:'Southeast_Asia', property:'Sofitel Singapore Sentosa Resort & Spa', location:'Singapore',               cash_usd:350, pts_per_night:22000, note:'Clifftop resort on Sentosa; best Accor in Singapore'},
       // East Asia
       {region:'East_Asia', property:'Sofitel Tokyo Takanawa',                  location:'Tokyo, Japan',                cash_usd:280, pts_per_night:18000, note:'French design in Minato; great base for Tokyo'},
+      {region:'East_Asia', property:'Pullman Osaka Namba',                     location:'Osaka, Japan',                cash_usd:200, pts_per_night:12000, note:'Modern Accor hotel in Namba; excellent Osaka value'},
       {region:'East_Asia', property:'Fairmont Peace Hotel Shanghai',           location:'Shanghai, China',             cash_usd:350, pts_per_night:22000, note:'Art Deco icon on the Bund; legendary Jazz Bar'},
       {region:'East_Asia', property:'Pullman Tokyo Tamachi',                   location:'Tokyo, Japan',                cash_usd:200, pts_per_night:12000, note:'Modern business hotel; best Accor value in Tokyo'},
       // Middle East
@@ -1221,6 +1223,7 @@ const HOTEL_CHARTS = {
       {region:'Southeast_Asia', property:'Hilton Hanoi Opera',                 location:'Hanoi, Vietnam',              cash_usd:150, pts_per_night:30000, note:'Central location near Hoan Kiem Lake'},
       // East Asia
       {region:'East_Asia', property:'Conrad Tokyo',                            location:'Tokyo, Japan',                cash_usd:500, pts_per_night:80000, note:'Shiodome; Tokyo Bay views and world-class spa'},
+      {region:'East_Asia', property:'DoubleTree by Hilton Osaka',              location:'Osaka, Japan',                cash_usd:200, pts_per_night:35000, note:'Namba location; best Hilton value in Osaka'},
       {region:'East_Asia', property:'Waldorf Astoria Seoul Josun',             location:'Seoul, South Korea',          cash_usd:500, pts_per_night:90000, note:'Revived 1914 icon; best hotel in Seoul'},
       {region:'East_Asia', property:'Conrad Hong Kong',                        location:'Hong Kong',                   cash_usd:450, pts_per_night:75000, note:'Pacific Place, Admiralty; Victoria Harbour views'},
       // Middle East
@@ -1349,7 +1352,14 @@ function getRecommendations(cardId, pointsBal, destRegion, tripDays, travelers, 
 
   // Baseline
   const baseTotal = Math.round(pointsBal * baseVpp);
-  results.push({ type:'baseline', partner:null, mapping:null, method:card.baseline.method, methodNote:card.baseline.note, cardPts:pointsBal, cashVal:baseTotal, vpp:baseVpp, vsB:1.0, leftover:0 });
+  // For hotel-only queries: only add baseline as a fallback when no hotels matched;
+  // hotel results already show vsB relative to baseline, so baseline as a ranked card is confusing
+  const hotelResultsFound = results.some(r => r.type === 'hotel');
+  if (recType !== 'stay' || !hotelResultsFound) {
+    results.push({ type: recType === 'stay' && !hotelResultsFound ? 'no-hotel-data' : 'baseline',
+      partner:null, mapping:null, method:card.baseline.method, methodNote:card.baseline.note,
+      cardPts:pointsBal, cashVal:baseTotal, vpp:baseVpp, vsB:1.0, leftover:0 });
+  }
 
   // Sort by vpp desc, de-dupe
   results.sort((a,b) => b.vpp - a.vpp);
@@ -1873,8 +1883,9 @@ function recCard(r, data) {
   const abbr  = card.points_currency.abbreviation;
   const vppCls = vppClass(r.vsB);
   const typePill = r.type==='airline' ? '<span class="type-pill pill-airline">✈ Airline Award</span>'
-                 : r.type==='hotel'   ? '<span class="type-pill pill-hotel">🏨 Hotel Award</span>'
-                 :                      '<span class="type-pill pill-baseline">🏦 Direct Redemption</span>';
+                 : r.type==='hotel'          ? '<span class="type-pill pill-hotel">🏨 Hotel Award</span>'
+                 : r.type==='no-hotel-data' ? '<span class="type-pill pill-baseline">ℹ️ No Hotel Data</span>'
+                 :                            '<span class="type-pill pill-baseline">🏦 Direct Redemption</span>';
 
   // Detail rows
   let details = '';
@@ -1949,7 +1960,9 @@ function renderResults(data) {
   const card = q.card;
 
   let summaryHTML = '';
-  if (top.type === 'baseline') {
+  if (top.type === 'no-hotel-data') {
+    summaryHTML = `No hotel award properties found for this destination in our database. Hotel transfers are available — check Marriott Bonvoy, IHG, or Accor directly for ${top.methodNote||'this region'}. Alternatively, redeem points via ${card.bank} portal at <strong>${vppF(q.baseVpp)}/point</strong>.`;
+  } else if (top.type === 'baseline') {
     summaryHTML = `No transfer partner beats direct portal redemption for this query. Best option: redeem via ${card.bank} portal at <strong>${vppF(q.baseVpp)}/point</strong> for <strong>${inr(q.baseTotal)}</strong> total.`;
   } else {
     const uplift = top.vsB ? `<strong>${((top.vsB-1)*100).toFixed(0)}% more value</strong>` : '';
