@@ -844,20 +844,20 @@ const AIRLINE_CHARTS = {
 
   // ── Singapore Airlines KrisFlyer ─────────────────────────────────────────
   sq_krisflyer: [
-    {region:'Southeast_Asia', cabin:'economy', ow:17500, rt:35000,  routes:['BOM-SIN-SGN','DEL-SIN-HAN','BLR-SIN-DAD'],   note:'Vietnam routing via SIN hub'},
+    {region:'Southeast_Asia', cabin:'economy', ow:20000, rt:40000,  routes:['BOM-SIN-SGN','DEL-SIN-HAN','BLR-SIN-DAD'],   note:'Zone 6 (India) to Zone 3 (SE Asia) Saver: 20,000 OW (SQ zone chart)'},
     {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['BOM-SIN-SGN (biz)','DEL-SIN-HAN (biz)'],      note:'Lie-flat seats; excellent SQ product'},
     {region:'Southeast_Asia', cabin:'first',   ow:60000, rt:120000, routes:['DEL-SIN (Suites)'],                             note:'Singapore Suites on select DEL-SIN flights'},
-    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['BOM-SIN-NRT','DEL-SIN-ICN','BOM-SIN-HKG'],    note:'Via SIN hub; SQ and partner airlines'},
+    {region:'East_Asia',      cabin:'economy', ow:43000, rt:86000,  routes:['BOM-SIN-NRT','DEL-SIN-ICN','BOM-SIN-HKG'],    note:'Zone 6 to Zone 7 (Japan/Korea) Saver: ~43,000 OW (SQ zone chart)'},
     {region:'East_Asia',      cabin:'business',ow:60000, rt:120000, routes:['BOM-SIN-NRT (biz)','DEL-SIN-ICN (biz)'],       note:'SQ business to Japan is consistently excellent'},
     {region:'East_Asia',      cabin:'first',   ow:85000, rt:170000, routes:['DEL-SIN-NRT (Suites)'],                         note:'Singapore Suites on DEL-SIN; connect NRT on SQ biz'},
-    {region:'Middle_East',    cabin:'economy', ow:35000, rt:70000,  routes:['BOM-SIN-DXB (SQ/EK)'],                          note:'Indirect routing via SIN; EY or EK direct options are cheaper'},
+    {region:'Middle_East',    cabin:'economy', ow:40000, rt:80000,  routes:['BOM-SIN-DXB (SQ/EK)'],                          note:'Zone 6 to Zone 10 (ME) Saver: ~40,000 OW. EY/EK direct is usually cheaper.'},
     {region:'Middle_East',    cabin:'business',ow:65000, rt:130000, routes:['BOM-SIN-DXB (biz)'],                             note:'Not the most efficient for Middle East; consider Etihad/Emirates direct'},
     {region:'Europe',         cabin:'economy', ow:52500, rt:105000, routes:['BOM-SIN-LHR','DEL-SIN-CDG'],                    note:'SQ has daily LHR and CDG flights via SIN'},
-    {region:'Europe',         cabin:'business',ow:96000, rt:192000, routes:['BOM-SIN-LHR (biz)'],                             note:'SQ Business Class (The Suite) on LHR route is world-class'},
-    {region:'North_America',  cabin:'economy', ow:77500, rt:155000, routes:['BOM-SIN-LAX','DEL-SIN-SFO','BOM-SIN-JFK'],     note:'SQ nonstop SIN-LAX/SFO/JFK — long haul from India via SIN'},
-    {region:'North_America',  cabin:'business',ow:130000,rt:260000, routes:['BOM-SIN-LAX (biz)','DEL-SIN-JFK (biz)'],        note:'SQ A350 ULR business class to USA is outstanding. High mile cost.'},
+    {region:'Europe',         cabin:'business',ow:109000,rt:218000, routes:['BOM-SIN-LHR (biz)'],                             note:'Post-Nov 2025 devaluation: ~109,000 OW (up from 96,000). SQ Business The Suite is world-class.'},
+    {region:'North_America',  cabin:'economy', ow:55000, rt:110000, routes:['BOM-SIN-LAX','DEL-SIN-SFO','BOM-SIN-JFK'],     note:'Zone 6 to Zone 12/13 (US) Saver: ~51,000-60,500 OW pre-devaluation; est. ~55,000 current'},
+    {region:'North_America',  cabin:'business',ow:110000,rt:220000, routes:['BOM-SIN-LAX (biz)','DEL-SIN-JFK (biz)'],        note:'Zone 6 to Zone 12/13 business Saver: ~97,500-103,000 pre-devaluation; est. ~110,000 current. SQ A350 ULR.'},
     {region:'Australia_NZ',   cabin:'economy', ow:42500, rt:85000,  routes:['BOM-SIN-SYD','DEL-SIN-MEL'],                   note:'Via SIN hub; frequent flights'},
-    {region:'Australia_NZ',   cabin:'business',ow:80000, rt:160000, routes:['BOM-SIN-SYD (biz)','DEL-SIN-MEL (biz)'],        note:'SQ Business Class to Australia — great product'},
+    {region:'Australia_NZ',   cabin:'business',ow:72000, rt:144000, routes:['BOM-SIN-SYD (biz)','DEL-SIN-MEL (biz)'],        note:'Zone 6 to Zone 9 (Australia) business Saver: 72,000 OW (current confirmed rate). SQ Business Class.'},
   ],
 
   // ── Air India Maharaja Club ───────────────────────────────────────────────
@@ -1067,21 +1067,21 @@ const AIRLINE_CHARTS = {
 
   // ── Japan Airlines (JAL Mileage Bank) ────────────────────────────────────
   japan_airlines_jal: [
-    {region:'Southeast_Asia', cabin:'economy', ow:35000, rt:70000,  routes:['DEL-NRT-BKK (JL)','BOM-HKG-NRT-SGN (JL/CX)'],note:'JAL routes to SE Asia involve routing via Japan. Less efficient.'},
-    {region:'Southeast_Asia', cabin:'business',ow:65000, rt:130000, routes:['DEL-NRT-BKK (JL biz)'],                          note:'JAL business class via Japan hub — high cost due to zone routing'},
-    {region:'East_Asia',      cabin:'economy', ow:35000, rt:70000,  routes:['DEL-NRT (JL)','BOM-HKG-NRT (JL via partner)'], note:"Japan is JAL's home — best value here. DEL-NRT via various connections."},
-    {region:'East_Asia',      cabin:'business',ow:60000, rt:120000, routes:['DEL-NRT (JL biz Sky Suite)'],                    note:'JAL Sky Suite business class — lie-flat, door, excellent service'},
-    {region:'East_Asia',      cabin:'first',   ow:90000, rt:180000, routes:['DEL-NRT (JL First Suite)'],                      note:'JAL First Class Suite — private cabin, kaiseki meal service'},
+    {region:'Southeast_Asia', cabin:'economy', ow:17500, rt:35000,  routes:['DEL-NRT-BKK (JL)','BOM-HKG-NRT-SGN (JL/CX)'],note:'India to Japan = 17,500 eco OW (JAL official Apr 2026); highest segment pricing applies for SE Asia via NRT.'},
+    {region:'Southeast_Asia', cabin:'business',ow:40000, rt:80000,  routes:['DEL-NRT-BKK (JL biz)'],                          note:'India to Japan business = 40,000 OW (JAL official Apr 2026); highest segment pricing for SE Asia via NRT.'},
+    {region:'East_Asia',      cabin:'economy', ow:17500, rt:35000,  routes:['DEL-NRT (JL)','BOM-HKG-NRT (JL via partner)'], note:'Official JAL chart Apr 2026: DEL-NRT economy = 17,500 OW. Best JAL sweet spot from India.'},
+    {region:'East_Asia',      cabin:'business',ow:40000, rt:80000,  routes:['DEL-NRT (JL biz Sky Suite)'],                    note:'Official JAL chart Apr 2026: DEL-NRT business = 40,000 OW. JAL Sky Suite is outstanding.'},
+    {region:'East_Asia',      cabin:'first',   ow:90000, rt:180000, routes:['DEL-NRT (JL First Suite)'],                      note:'Warning: JAL First Class not available on DEL-NRT route (medium-haul; no first cabin). First Suite available only on NRT to LHR/LAX/JFK.'},
     {region:'Middle_East',    cabin:'economy', ow:45000, rt:90000,  routes:['DEL-NRT-DXB (JL via partner)'],                  note:'Long routing via Japan to Middle East. Not a sweet spot.'},
     {region:'Middle_East',    cabin:'business',ow:80000, rt:160000, routes:['DEL-NRT-DXB (JL partner biz)'],                  note:'JAL Oneworld partners for Middle East via Japan hub'},
-    {region:'Europe',         cabin:'economy', ow:55000, rt:110000, routes:['DEL-NRT-LHR (JL)','BOM-NRT-FRA (JL partner)'], note:'JAL has code-share with BA and Oneworld partners for Europe'},
-    {region:'Europe',         cabin:'business',ow:90000, rt:180000, routes:['DEL-NRT-LHR (JL biz)'],                          note:'JAL business class to Europe via NRT — excellent service'},
+    {region:'Europe',         cabin:'economy', ow:27000, rt:54000,  routes:['DEL-NRT-LHR (JL)','BOM-NRT-FRA (JL partner)'], note:'Japan to London economy = 27,000 OW (JAL official Apr 2026). DEL-NRT-LHR priced at highest segment.'},
+    {region:'Europe',         cabin:'business',ow:57000, rt:114000, routes:['DEL-NRT-LHR (JL biz)'],                          note:'Japan to London business = 57,000 OW (JAL official Apr 2026). JAL Sky Suite via NRT.'},
     {region:'Europe',         cabin:'first',   ow:130000,rt:260000, routes:['DEL-NRT-LHR (JL First)'],                        note:'JAL First Suite to Europe via NRT — extremely premium experience'},
-    {region:'North_America',  cabin:'economy', ow:60000, rt:120000, routes:['DEL-NRT-LAX (JL)','DEL-NRT-JFK (JL partner)'],note:'JAL flies NRT to LAX/SFO/JFK/ORD/DFW — good US coverage from Tokyo'},
-    {region:'North_America',  cabin:'business',ow:95000, rt:190000, routes:['DEL-NRT-LAX (JL biz)','DEL-NRT-JFK (JL biz)'], note:'JAL business to USA via NRT — JAL Sky Suite is excellent'},
-    {region:'North_America',  cabin:'first',   ow:155000,rt:310000, routes:['DEL-NRT-LAX (JL First Suite)'],                  note:'JAL First Class Suite to USA — private cabin, exceptional food'},
-    {region:'Australia_NZ',   cabin:'economy', ow:55000, rt:110000, routes:['DEL-NRT-SYD (JL)','DEL-NRT-MEL (JL partner)'],note:'JAL flies NRT-SYD/MEL. Routing via Japan adds distance.'},
-    {region:'Australia_NZ',   cabin:'business',ow:85000, rt:170000, routes:['DEL-NRT-SYD (JL biz)'],                          note:'JAL business class to Australia via NRT hub'},
+    {region:'North_America',  cabin:'economy', ow:27000, rt:54000,  routes:['DEL-NRT-LAX (JL)','DEL-NRT-JFK (JL partner)'],note:'Japan to New York economy = 27,000 OW (JAL official Apr 2026). DEL-NRT-US priced at highest segment.'},
+    {region:'North_America',  cabin:'business',ow:55000, rt:110000, routes:['DEL-NRT-LAX (JL biz)','DEL-NRT-JFK (JL biz)'], note:'Japan to New York business = 55,000 OW (JAL official Apr 2026). JAL Sky Suite to USA.'},
+    {region:'North_America',  cabin:'first',   ow:110000,rt:220000, routes:['DEL-NRT-LAX (JL First Suite)'],                  note:'JAL First Suite NRT-LAX/JFK: ~110,000 OW est. Book as DEL-NRT (biz/eco) + NRT-US First Suite.'},
+    {region:'Australia_NZ',   cabin:'economy', ow:23000, rt:46000,  routes:['DEL-NRT-SYD (JL)','DEL-NRT-MEL (JL partner)'],note:'Japan to Sydney economy = 23,000 OW (JAL official Apr 2026). DEL-NRT-SYD priced at highest segment.'},
+    {region:'Australia_NZ',   cabin:'business',ow:45000, rt:90000,  routes:['DEL-NRT-SYD (JL biz)'],                          note:'Japan to Sydney business = 45,000 OW (JAL official Apr 2026). JAL Sky Suite to Australia via NRT.'},
   ],
 
   // ── Qantas Frequent Flyer ─────────────────────────────────────────────────
